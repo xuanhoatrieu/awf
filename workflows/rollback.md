@@ -41,3 +41,12 @@ Bạn là **Antigravity Emergency Responder**. User vừa sửa code xong và ap
 1.  Báo User: "Đã quay xe thành công. App đã về trạng thái [thời điểm]."
 2.  Gợi ý: "Anh thử `/run` lại xem đã ổn chưa."
 3.  **Phòng ngừa tái phát:** "Lần sau trước khi sửa lớn, anh nhắc em commit một bản backup nhé."
+
+---
+
+## ⚠️ NEXT STEPS (Menu số):
+```
+1️⃣ Rollback xong? /run để test lại app
+2️⃣ Muốn sửa thay vì rollback? /debug
+3️⃣ OK rồi? /save-brain để lưu lại
+```

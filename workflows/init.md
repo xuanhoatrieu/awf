@@ -1,159 +1,145 @@
 ---
-description: ✨ Tạo dự án mới
+description: Khởi tạo dự án mới
 ---
 
-# WORKFLOW: /init - The Project Bootstrapper (Complete Setup)
+# WORKFLOW: /init - Khởi Tạo Dự Án
 
-Bạn là **Antigravity Project Initializer**. User muốn bắt đầu dự án từ con số 0, KHÔNG BIẾT các thứ kỹ thuật như package manager, environment variables, git.
+**Vai trò:** Project Initializer
+**Mục tiêu:** Capture ý tưởng và tạo workspace cơ bản. KHÔNG install packages, KHÔNG setup database.
 
-**Nhiệm vụ:** Dựng lên "Bộ xương" hoàn chỉnh và hướng dẫn từng bước.
-
----
-
-## Giai đoạn 1: Vision Capture (Hiểu ý tưởng)
-
-### 1.1. Loại App
-*   "Anh muốn làm loại app gì?"
-    *   A) **Website đơn giản** (Landing page, Blog, Portfolio)
-    *   B) **Web App** (Có đăng nhập, Dashboard, quản lý data)
-    *   C) **API Backend** (Chỉ có Server, không giao diện)
-    *   D) **Full-stack** (Frontend + Backend + Database)
-    *   E) **Mobile App** (Ứng dụng điện thoại)
-
-### 1.2. Tên Project
-*   "Tên dự án là gì? (Viết liền không dấu, VD: my-cool-app)"
-
-### 1.3. Thư mục
-*   "Anh muốn tạo project ở thư mục nào?"
-*   Hoặc tự động tạo trong thư mục hiện tại.
+**NGÔN NGỮ: Luôn trả lời bằng tiếng Việt.**
 
 ---
 
-## Giai đoạn 2: Tech Stack Selection (AI tự quyết)
+## Flow Position
 
-AI tự chọn công nghệ phù hợp nhất (User không cần biết):
-
-*   **Website đơn giản:** Next.js + TailwindCSS
-*   **Web App:** Next.js + TailwindCSS + PostgreSQL + Prisma + NextAuth
-*   **API Backend:** Node.js + Fastify + PostgreSQL + Prisma
-*   **Full-stack:** Next.js Full-stack + PostgreSQL
-*   **Mobile:** React Native hoặc Expo
-
----
-
-## Giai đoạn 3: Hidden Setup (Những thứ User không biết)
-
-AI TỰ ĐỘNG thiết lập những thứ quan trọng mà User thường quên:
-
-### 3.1. Environment Variables
-*   Tạo file `.env.example` với tất cả các biến môi trường cần thiết.
-*   Tạo file `.env.local` để User điền giá trị thật.
-*   **Giải thích từng biến:**
-    ```
-    # Database connection
-    DATABASE_URL=postgresql://user:password@localhost:5432/mydb
-    
-    # Authentication secret (Random string, keep secret!)
-    NEXTAUTH_SECRET=your-secret-here
-    
-    # App URL
-    NEXT_PUBLIC_APP_URL=http://localhost:3000
-    ```
-
-### 3.2. Git Setup
-*   Khởi tạo Git repository.
-*   Tạo `.gitignore` chuẩn (ignore node_modules, .env, etc.).
-*   Tạo commit đầu tiên: "Initial project setup".
-
-### 3.3. Code Quality Tools
-*   Cài ESLint (Kiểm tra lỗi code).
-*   Cài Prettier (Format code đẹp).
-*   Tạo config files.
-
-### 3.4. Folder Structure
-*   Tạo cấu trúc thư mục chuẩn Enterprise:
-    ```
-    /src
-      /app (hoặc /pages)
-      /components
-      /lib
-      /services
-      /types
-      /utils
-    /docs
-      /specs
-      /architecture
-    /scripts
-    /public
-    ```
-
-### 3.5. README.md
-*   Tạo README với hướng dẫn:
-    *   Cách cài đặt
-    *   Cách chạy dev server
-    *   Cách build production
-    *   Cấu trúc thư mục
+```
+[/init] ← BẠN ĐANG Ở ĐÂY
+   ↓
+/brainstorm (nếu chưa rõ ý tưởng)
+   ↓
+/plan (lên kế hoạch features)
+   ↓
+/design (thiết kế kỹ thuật)
+   ↓
+/code (viết code)
+```
 
 ---
 
-## Giai đoạn 4: Dependencies Installation
+## Stage 1: Capture Vision (HỎI NGẮN GỌN)
 
-### 4.1. Core Dependencies
-*   Chạy `npm install` (hoặc yarn/pnpm).
-*   Cài các thư viện cần thiết theo loại app.
+### 1.1. Tên dự án
+"Tên dự án là gì? (VD: my-coffee-app)"
 
-### 4.2. Dev Dependencies
-*   TypeScript
-*   ESLint, Prettier
-*   Testing tools (Jest, Playwright)
+### 1.2. Mô tả 1 câu
+"Mô tả ngắn gọn app làm gì? (1-2 câu)"
 
----
+### 1.3. Vị trí
+"Tạo ở thư mục hiện tại hay chỗ khác?"
 
-## Giai đoạn 5: Database Setup (Nếu cần)
-
-### 5.1. Chọn Database
-*   **SQLite:** Đơn giản, không cần cài gì thêm.
-*   **PostgreSQL:** Chuyên nghiệp, cần cài riêng.
-
-### 5.2. Hướng dẫn cài Database (Nếu PostgreSQL)
-*   "Anh đã cài PostgreSQL chưa?"
-    *   **Chưa:** Hướng dẫn cài (link download, bước cài).
-    *   **Rồi:** "Username và password database là gì?"
-
-### 5.3. Initial Schema
-*   Tạo file migration cơ bản (Users table nếu có Auth).
+**XONG. Không hỏi thêm.**
 
 ---
 
-## Giai đoạn 6: First Run Test
+## Stage 2: Tạo Workspace (CHỈ TẠO FOLDER)
 
-1.  Chạy `npm run dev` để kiểm tra.
-2.  Mở browser tại `http://localhost:3000`.
-3.  Xác nhận app hoạt động.
+Chỉ tạo cấu trúc folder cơ bản:
+
+```
+{project-name}/
+├── .brain/
+│   └── brain.json      # Project context (empty template)
+├── docs/
+│   └── ideas.md        # Ghi ý tưởng
+└── README.md           # Tên + mô tả
+```
+
+### brain.json template:
+```json
+{
+  "project": {
+    "name": "{project-name}",
+    "description": "{mô tả}",
+    "created_at": "{timestamp}"
+  },
+  "tech_stack": [],
+  "features": [],
+  "decisions": []
+}
+```
+
+### README.md template:
+```markdown
+# {Project Name}
+
+{Mô tả 1 câu}
+
+## Status: 🚧 Planning
+
+Dự án đang trong giai đoạn lên ý tưởng.
+
+## Next Steps
+
+1. Gõ `/brainstorm` để explore ý tưởng
+2. Hoặc `/plan` nếu đã rõ muốn làm gì
+```
 
 ---
 
-## Giai đoạn 7: Documentation Bootstrap
+## Stage 3: Xác nhận & Hướng dẫn
 
-1.  Tạo `docs/architecture/system_overview.md` sơ khai.
-2.  Chạy `/save-brain` để lưu cấu trúc ban đầu.
+```
+✅ Đã tạo workspace cho "{project-name}"!
+
+📁 Vị trí: {path}
+
+🚀 BƯỚC TIẾP THEO:
+
+Chọn 1 trong 2:
+
+1️⃣ /brainstorm - Nếu chưa rõ muốn làm gì, cần explore ý tưởng
+2️⃣ /plan - Nếu đã biết rõ features cần làm
+
+💡 Tip: Newbie nên chọn /brainstorm trước!
+```
 
 ---
 
-## Giai đoạn 8: Handover
+## QUAN TRỌNG - KHÔNG LÀM
 
-1.  Báo User: "Dự án đã sẵn sàng!"
-2.  Tóm tắt:
-    *   "Tech stack: [Danh sách]"
-    *   "Chạy dev: `npm run dev`"
-    *   "Mở browser: `http://localhost:3000`"
-3.  Next steps:
-    *   "Gõ `/plan` để bắt đầu thiết kế tính năng đầu tiên."
-    *   "Gõ `/visualize` nếu muốn làm giao diện trước."
+❌ KHÔNG install packages (để /code làm)
+❌ KHÔNG setup database (để /design làm)
+❌ KHÔNG tạo code files (để /code làm)
+❌ KHÔNG chạy npm/yarn/pnpm
+❌ KHÔNG hỏi về tech stack (AI sẽ tự quyết sau)
 
 ---
 
-## ⚠️ NEXT STEPS:
-*   Bắt đầu tính năng → `/plan`
-*   Thiết kế UI → `/visualize`
-*   Chạy thử → `/run`
+## First-time User
+
+Nếu chưa có `.brain/preferences.json`:
+
+```
+👋 Chào mừng bạn đến với AWF!
+
+Đây là lần đầu dùng. Bạn muốn:
+1️⃣ Dùng mặc định (Recommended)
+2️⃣ Tùy chỉnh (/customize)
+```
+
+---
+
+## Error Handling
+
+### Folder đã tồn tại:
+```
+⚠️ Folder "{name}" đã có rồi.
+1️⃣ Dùng folder này (có thể ghi đè)
+2️⃣ Đổi tên khác
+```
+
+### Không có quyền tạo folder:
+```
+❌ Không tạo được folder. Kiểm tra quyền write nhé!
+```
