@@ -62,8 +62,13 @@ Step 2: Load Handover (nếu có) 🆕
 └── .brain/handover.md                  # Proactive handover từ session trước
     → Đọc ngay nếu có → Skip các bước sau
 
-Step 3: Load Project Knowledge
-└── .brain/brain.json                   # Static knowledge
+Step 3: Load Project Knowledge (Brain v2 — split files)
+├── .brain/project.json              # Meta, infra, github, tech_stack
+├── .brain/domain.json               # Kiến thức nghiệp vụ, validation rules
+├── .brain/knowledge.json            # Patterns, gotchas, decisions
+└── .brain/features.json             # Features grouped by module
+    → Đọc project.json + session.json TRƯỚC (core context)
+    → Đọc domain.json, knowledge.json, features.json KHI CẦN
 
 Step 4: Load Session State
 ├── .brain/session.json                 # Current state
@@ -89,28 +94,23 @@ if exists(".brain/handover.md"):
     → Hỏi user: "Tiếp tục từ đây?"
     → Nếu OK → Xóa handover.md (đã resume)
 
-elif exists(".brain/session.json") AND exists(".brain/session_log.txt"):
-    → Parse session.json
-    → Đọc 20 dòng cuối session_log.txt
+elif exists(".brain/project.json"):
+    → Parse project.json + session.json (core)
+    → Lazy-load domain.json, knowledge.json, features.json khi cần
     → Skip to Phase 2
 
 elif exists(".brain/brain.json"):
-    → Parse brain.json
+    → Legacy mode — parse brain.json
     → Session info từ git status
 
 else:
     → Fallback to Deep Scan (1.3)
 ```
 
-**Lợi ích AWF 2.0:**
-- `handover.md`: Resume nhanh sau context limit
-- `session_log.txt`: Chi tiết từng task đã làm
-- `session.json`: State chính (update mỗi phase)
-
-**Lợi ích tách file:**
-- `brain.json` (~2KB): Ít thay đổi, project knowledge
-- `session.json` (~1KB): Thay đổi liên tục, current state
-- Total: ~3KB vs ~10KB scattered markdown
+**Lợi ích Brain v2 (split files):**
+- Đọc nhanh: chỉ load file cần thiết (~4KB thay vì 31KB)
+- Sửa an toàn: file nhỏ → ít risk corrupt JSON
+- Lazy-load: domain/knowledge/features chỉ đọc khi workflow cần
 
 ### 1.3. Fallback: Deep Context Scan (Nếu không có .brain/)
 1.  **Tự động quét các nguồn thông tin (KHÔNG hỏi User):**

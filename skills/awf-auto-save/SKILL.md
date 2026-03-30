@@ -1,223 +1,133 @@
 ---
 name: awf-auto-save
 description: >-
-  Eternal Context System - Auto-save session to prevent context loss.
-  Triggers: workflow end, user leaving, decisions, periodic checkpoint.
-  Warns when context is getting full.
-version: 1.0.0
+  Auto-save brain context based on file edit count and workflow completion.
+  Triggers: workflow end, 15+ file edits, user leaving, before notify_user.
+version: 2.0.0
 ---
 
-# AWF Auto-Save (Eternal Context)
+# AWF Auto-Save v2.0 (CLI-Based)
 
-Tu dong luu session de khong bao gio mat context.
+Tự động lưu session để không bao giờ mất context.
+
+## Brain v2 File Structure
+
+```
+.brain/
+├── project.json      # Meta, infra, github, tech_stack (ít thay đổi)
+├── domain.json       # Kiến thức nghiệp vụ (hầu như không đổi)
+├── knowledge.json    # Patterns, gotchas, decisions (thêm dần)
+├── features.json     # Features grouped by module (thêm dần)
+└── session.json      # Working_on, recent_changes (thay đổi liên tục)
+```
 
 ## Trigger Conditions
 
-### 1. Workflow End (Automatic)
-Sau khi hoan thanh bat ky workflow nao:
-- `/plan` → Save decisions, specs
-- `/code` → Save progress, files changed
-- `/debug` → Save errors resolved
-- `/test` → Save test results
-- `/deploy` → Save deployment info
+### 1. Workflow End (Auto — silent save)
+Sau khi hoàn thành bất kỳ workflow nào (`/code`, `/debug`, `/refactor`, `/test`, `/deploy`):
+- Update `session.json` → working_on, recent_changes
+- **Silent** — không thông báo user
 
-### 2. User Leaving Detection
-Pattern matching trong tin nhan user:
+### 2. File Edit Threshold (Auto — notify)
+AI tự đếm số file đã edit trong session:
+```
+if file_edit_count >= 5:
+    → Silent save session.json
+
+if file_edit_count >= 15:
+    → Save session.json
+    → Show: "💾 Đã auto-save (15+ files changed). Anh có muốn /save-brain đầy đủ không?"
+```
+
+### 3. User Leaving Detection
+Pattern matching trong tin nhắn user:
 ```
 patterns:
-  - "bye", "tam biet", "tam nghi"
-  - "toi di", "di an com", "nghi thoi"
-  - "het gio", "mai lam tiep", "save"
-  - "dong app", "tat may"
+  - "bye", "tạm biệt", "tạm nghỉ"
+  - "tôi đi", "đi ăn cơm", "nghỉ thôi"
+  - "hết giờ", "mai làm tiếp", "save"
+  - "đóng app", "tắt máy"
 ```
+→ Full save: session.json + knowledge.json (nếu có decisions/gotchas mới)
 
-### 3. Decision Made Detection
-Khi user dua ra quyet dinh:
-```
-patterns:
-  - "chon phuong an", "dung cai nay"
-  - "ok", "dong y", "lam vay"
-  - "quyet dinh la", "se dung"
-```
-
-### 4. Periodic Checkpoint
-Moi 15 tin nhan → Background save
-
-### 5. Context Warning (80% estimate)
-```
-token_estimate = message_count * 150 + code_blocks * 300
-if token_estimate > 100000:  # 80% of 128K
-    trigger_emergency_save()
-    show_warning()
-```
+### 4. Before notify_user (Auto — silent)
+Trước mỗi lần gọi `notify_user` (kết thúc task view):
+→ Silent save session.json
 
 ## Execution Logic
 
-### Step 1: Detect Trigger
-
+### Save Session (Lightweight — ~20 tokens)
 ```
-on_message(user_input):
-    increment message_count
-
-    if matches_leaving_pattern(user_input):
-        trigger = "user_leaving"
-    elif matches_decision_pattern(user_input):
-        trigger = "decision_made"
-    elif message_count % 15 == 0:
-        trigger = "periodic"
-    elif estimate_tokens() > 100000:
-        trigger = "emergency"
-    else:
-        return  # No save needed
-
-    execute_save(trigger)
+Chỉ update session.json:
+1. working_on → task hiện tại
+2. recent_changes → append (max 10, xóa cũ nhất)
+3. updated_at → timestamp
 ```
 
-### Step 2: Generate Summary
-
+### Save Full (Khi user gọi /save-brain hoặc leaving)
 ```
-summary = {
-    project: brain.project.name,
-    current_feature: session.working_on.feature,
-    current_task: session.working_on.task,
-    status: session.working_on.status,
-    progress_percent: calculate_progress(),
-    last_action: get_last_action(),
-    next_step: suggest_next_step()
+1. session.json → working_on + recent_changes
+2. knowledge.json → append gotchas/patterns mới (nếu có)
+3. features.json → update status (nếu feature mới hoàn thành)
+4. project.json → update meta.last_saved + save_count
+```
+
+## Hướng dẫn cho AI Agent
+
+### Đếm file edits
+AI PHẢI tự track trong context:
+- Mỗi lần gọi `write_to_file`, `replace_file_content`, `multi_replace_file_content` → +1
+- Khi count >= 5 → trigger silent save
+- Khi count >= 15 → trigger save + notify
+
+### Session.json update template
+```json
+{
+  "updated_at": "[ISO timestamp]",
+  "working_on": {
+    "feature": "[tên feature]",
+    "task": "[mô tả task hiện tại]",
+    "status": "in_progress|completed",
+    "notes": "[context quan trọng]"
+  }
 }
 ```
 
-### Step 3: Save to Session
-
-```
-session.summary = summary
-session.message_count = current_count
-session.context_checkpoints.append({
-    timestamp: now(),
-    trigger: trigger_type,
-    summary: compress_summary(summary),
-    message_count: current_count
-})
-save_to_file(".brain/session.json")
-```
-
-### Step 4: Notify User (if enabled)
-
-```
-if trigger == "user_leaving":
-    show: "💾 Thay ban chuan bi di, da auto-save session."
-
-if trigger == "workflow_end":
-    show: "💾 Da luu tien do. Ban co the dong app an toan."
-
-if trigger == "emergency":
-    show: "⚠️ Context sap day. Da save backup. Nen bat dau session moi."
-
-if trigger == "periodic" or "decision_made":
-    # Silent save - no notification
-```
-
-## Token Estimation Heuristic
-
-```
-function estimate_tokens():
-    base = message_count * 150
-    code_blocks = count_code_blocks() * 300
-    error_dumps = count_errors() * 200
-
-    return base + code_blocks + error_dumps
-
-function get_warning_level():
-    tokens = estimate_tokens()
-    if tokens > 115000: return "critical"  # 90%
-    if tokens > 100000: return "warning"   # 80%
-    if tokens > 80000: return "info"       # 60%
-    return "safe"
-```
-
-## Snapshot Management
-
-### Save Snapshot (7 days retention)
-```
-on_workflow_end():
-    snapshot = {
-        timestamp: now(),
-        session: session.json,
-        brain_summary: extract_brain_summary()
-    }
-    save_to(".brain/snapshots/{date}_{time}.json")
-
-    # Cleanup old snapshots
-    delete_snapshots_older_than(7_days)
-```
-
-### Restore from Snapshot
-```
-if session.json corrupted:
-    latest_snapshot = get_latest_snapshot()
-    restore_from(latest_snapshot)
-    show: "Da khoi phuc tu backup gan nhat."
-```
-
-## User Messages
-
-```yaml
-workflow_end:
-  vi: "💾 Da luu tien do. Ban co the dong app an toan."
-  en: "💾 Progress saved. You can safely close the app."
-
-user_leaving:
-  vi: "💾 Thay ban chuan bi di, da auto-save session."
-  en: "💾 Detected you're leaving, session auto-saved."
-
-context_warning:
-  vi: "⚠️ Context sap day. Da save backup. Nen go /save-brain roi bat dau session moi."
-  en: "⚠️ Context nearly full. Backup saved. Consider starting new session."
-
-emergency_save:
-  vi: "⚠️ Da luu khan cap. Go /recap trong session moi de tiep tuc."
-  en: "⚠️ Emergency save complete. Use /recap in new session to continue."
-```
+### recent_changes pruning
+- Giữ tối đa **10 entries**
+- Khi thêm entry mới mà đã đủ 10 → xóa entry cũ nhất
+- Mỗi entry: `{ timestamp, type, description }` (không cần files array)
 
 ## Integration with Workflows
 
-Moi workflow PHAI goi auto-save khi ket thuc:
+Mỗi workflow PHẢI có đoạn Post-Workflow cuối cùng:
 
 ```markdown
-# Cuoi moi workflow.md:
-
 ## Post-Workflow: Auto-Save
-
-Sau khi hoan thanh workflow:
-1. Cap nhat session.summary
-2. Append vao context_checkpoints
-3. Hien thong bao: "💾 Da luu tien do."
-```
-
-## Config Options
-
-```json
-{
-  "auto_save_config": {
-    "enabled": true,
-    "notify_on_save": true,
-    "checkpoint_interval": 15,
-    "warn_threshold": 80,
-    "snapshot_retention_days": 7
-  }
-}
+Sau khi hoàn thành:
+1. Update session.json → working_on (status: completed)
+2. Append recent_changes
+3. Nếu có decisions/gotchas mới → append vào knowledge.json
 ```
 
 ## Error Handling
 
 ```
 if save_fails:
-    retry 3 times with exponential backoff
+    retry 1 time
     if still fails:
-        show: "⚠️ Khong the luu session. Kiem tra quyen ghi file."
-        log error to console
+        → "⚠️ Không lưu được session. Kiểm tra quyền ghi file."
+```
 
-if disk_full:
-    delete oldest snapshots
-    retry save
+## Config (trong preferences.json)
+
+```json
+{
+  "auto_save": {
+    "enabled": true,
+    "silent_threshold": 5,
+    "notify_threshold": 15,
+    "max_recent_changes": 10
+  }
+}
 ```

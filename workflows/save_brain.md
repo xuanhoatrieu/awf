@@ -352,213 +352,99 @@ Khi có API mới, tự động append vào file docs hiện có.
 
 ---
 
-## Giai đoạn 6: Structured Context Generation ⭐ v3.3
+## Giai đoạn 6: Structured Context Generation ⭐ v4.2 (Brain v2)
 
-> **Mục đích:** Tách riêng static knowledge và dynamic session để AI parse nhanh hơn
+> **Mục đích:** Tách brain thành nhiều file nhỏ để AI đọc/sửa nhanh hơn, ít lỗi hơn
 
-### 6.1. Cấu trúc thư mục `.brain/`
+### 6.1. Cấu trúc thư mục `.brain/` (v2)
 
 ```
 .brain/                            # LOCAL (per-project)
-├── brain.json                     # 🧠 Static knowledge (ít thay đổi)
-├── session.json                   # 📍 Dynamic session (thay đổi liên tục)
-└── preferences.json               # ⚙️ Local override (nếu khác global)
+├── project.json                   # 🏗️ Meta, infra, github, tech_stack (~4KB)
+├── domain.json                    # 📚 Kiến thức nghiệp vụ, validation rules (~2KB)
+├── knowledge.json                 # 🧠 Patterns, gotchas, decisions (~3KB)
+├── features.json                  # ✅ Features grouped by module (~2KB)
+├── session.json                   # 📍 Working_on, recent_changes (~2KB)
+├── preferences.json               # ⚙️ Local override (nếu khác global)
+└── handover.md                    # 📋 Proactive handover (tạm)
 
 ~/.antigravity/                    # GLOBAL (tất cả dự án)
 ├── preferences.json               # Default preferences
 └── defaults/                      # Templates
 ```
 
-### 6.2. File brain.json (Static Knowledge)
+### 6.2. Mỗi file lưu gì?
 
-Chứa thông tin ít thay đổi:
+| File | Nội dung | Khi nào đọc | Khi nào sửa |
+|------|----------|-------------|-------------|
+| `project.json` | meta, infrastructure⚠️, github⚠️, tech_stack, project, security | `/recap` (luôn) | Thay đổi infra/stack |
+| `domain.json` | Org info, domain terms, workflows, validation rules | `/recap` (luôn) | Hầu như không đổi |
+| `knowledge.json` | decisions, patterns, gotchas, conventions | `/debug`, `/code`, `/audit` | Gặp bug/pattern mới |
+| `features.json` | Features grouped by module + pages | `/plan`, `/review` | Feature mới hoàn thành |
+| `session.json` | working_on, pending_tasks, recent_changes (max 10) | `/recap` (luôn) | Mỗi workflow end |
 
-```json
-{
-  "meta": { "schema_version": "1.2.0", "awf_version": "4.1.0" },
-  "project": { "name": "...", "type": "...", "status": "..." },
-  "infrastructure": { ... },     // ⭐ NEW — xem 6.2.1
-  "github": { ... },              // ⭐ NEW — xem 6.2.2
-  "tech_stack": { "frontend": {...}, "backend": {...}, "database": {...} },
-  "database_schema": { "tables": [...], "relationships": [...] },
-  "api_endpoints": [...],
-  "business_rules": [...],
-  "features": [...],
-  "knowledge_items": { "patterns": [...], "gotchas": [...], "conventions": [...] }
-}
-```
+> **⚠️ QUY TẮC VÀNG:** `infrastructure` và `github` trong project.json **TUYỆT ĐỐI KHÔNG ĐƯỢC XÓA**. Chỉ THÊM hoặc CẬP NHẬT.
 
-### 6.2.1. ⭐ Infrastructure Data (PERSISTENT — KHÔNG ĐƯỢC XÓA)
+### 6.3. Không lưu trong brain — dùng GitNexus
 
-> **QUY TẮC VÀNG:** Mục `infrastructure` và `github` trong brain.json **TUYỆT ĐỐI KHÔNG ĐƯỢC XÓA** khi save-brain ở các lần sau. Chỉ được **THÊM** hoặc **CẬP NHẬT** giá trị, KHÔNG BAO GIỜ xóa key đã có.
+| Trước (brain.json) | Sau (GitNexus CLI) |
+|----|----|
+| `api_endpoints` (40+ entries) | `npx gitnexus query "API routes"` |
+| `database_schema.core_models` | `npx gitnexus query "prisma models"` |
+| Technical feature details | `npx gitnexus query "[feature]"` |
 
-Lưu thông tin hạ tầng dự án:
-
-```json
-"infrastructure": {
-  "servers": [
-    {
-      "name": "Production",
-      "ip": "10.64.11.109",
-      "port": 3000,
-      "ssh_user": "moodle",
-      "os": "Ubuntu 24.04"
-    }
-  ],
-  "database": {
-    "type": "PostgreSQL",
-    "host": "localhost",
-    "port": 5432,
-    "name": "curriculum_manager",
-    "user": "postgres",
-    "password_hint": "Xem .env file",
-    "connection_string_env": "DATABASE_URL"
-  },
-  "services": [
-    { "name": "NextJS Dev", "port": 3000, "command": "npm run dev" },
-    { "name": "GitNexus MCP", "port": "stdio", "command": "npx gitnexus serve" }
-  ],
-  "api_base_url": "http://localhost:3000/api",
-  "domains": [],
-  "env_file": ".env",
-  "notes": "Thông tin bổ sung về hạ tầng"
-}
-```
-
-**Cách scan tự động:**
-```
-1. Đọc .env → Trích host, port, DB info
-2. Đọc package.json scripts → Liệt kê services
-3. Hỏi user: "IP server? Port? User SSH?"
-4. LƯU Ý: KHÔNG lưu password trực tiếp → chỉ lưu hint hoặc env var name
-```
-
-### 6.2.2. ⭐ GitHub Rules (PERSISTENT — KHÔNG ĐƯỢC XÓA)
-
-> **QUY TẮC VÀNG:** Mục `github` **TUYỆT ĐỐI KHÔNG ĐƯỢC XÓA**. Luôn hỏi user trước khi commit/push.
-
-```json
-"github": {
-  "repo_url": "https://github.com/username/repo",
-  "default_branch": "main",
-  "commit_rules": {
-    "always_ask_before_commit": true,
-    "commit_message_format": "conventional",
-    "commit_prefix": "feat|fix|refactor|docs|chore",
-    "protected_branches": ["main", "production"]
-  },
-  "push_rules": {
-    "always_ask_before_push": true,
-    "auto_push_after_commit": false
-  },
-  "deploy_branch": "main",
-  "gitignore_extras": [".brain/session.json", ".brain/handover.md"]
-}
-```
-
-**Luồng commit:**
-```
-1. AI chuẩn bị commit → LUÔN hỏi trước:
-   "📦 Em muốn commit với message: '[type]: [description]'
-    Files: [danh sách]
-    
-    1️⃣ OK, commit đi
-    2️⃣ Sửa message
-    3️⃣ Bỏ bớt file
-    4️⃣ Hủy"
-
-2. Sau khi commit → Hỏi push:
-   "Commit xong. Push lên [branch] không?
-    1️⃣ Push luôn
-    2️⃣ Chưa, commit thêm đã
-    3️⃣ Hủy"
-```
-
-### 6.2.3. Quy tắc Merge khi Save-Brain
-
-```
-Khi /save-brain lần 2, 3, ...
-
-❌ SAI: Overwrite toàn bộ brain.json
-✅ ĐÚNG: MERGE theo quy tắc:
-
-1. infrastructure → KEEP ALL existing, chỉ UPDATE giá trị hoặc ADD mới
-2. github → KEEP ALL existing, chỉ UPDATE giá trị
-3. tech_stack → Merge (thêm mới, update version)
-4. database_schema → Scan lại từ schema.prisma
-5. api_endpoints → Scan lại từ src/app/api/
-6. features → Merge (thêm mới, update status)
-7. knowledge_items → Append only (không xóa gotchas/patterns cũ)
-```
-```
-
-### 6.3. File session.json (Dynamic Session) ⭐ NEW
-
-Chứa thông tin thay đổi liên tục:
-
-```json
-{
-  "updated_at": "2026-01-17T18:30:00Z",
-  "working_on": {
-    "feature": "Revenue Reports",
-    "task": "Implement daily revenue chart",
-    "status": "coding",
-    "files": ["src/features/reports/components/revenue-chart.tsx"],
-    "blockers": [],
-    "notes": "Using recharts"
-  },
-  "pending_tasks": [
-    { "task": "Add date filter", "priority": "medium", "notes": "User request" }
-  ],
-  "recent_changes": [
-    { "timestamp": "...", "type": "feature", "description": "...", "files": [...] }
-  ],
-  "errors_encountered": [
-    { "error": "...", "solution": "...", "resolved": true }
-  ],
-  "decisions_made": [
-    { "decision": "Use recharts", "reason": "Better React integration" }
-  ]
-}
-```
+**Brain chỉ giữ:** Business context (tiếng Việt), quy tắc nghiệp vụ, decisions, gotchas.
 
 ### 6.4. Quy tắc update
 
 | Trigger | File cần update |
 |---------|-----------------|
-| Thêm API mới | `brain.json` → api_endpoints |
-| Thay đổi DB | `brain.json` → database_schema |
-| Fix bug | `session.json` → errors_encountered |
-| Thêm dependency | `brain.json` → tech_stack |
-| Feature mới | `brain.json` → features |
+| Thay đổi server/port | `project.json` → infrastructure (MERGE only) |
+| Config GitHub | `project.json` → github (MERGE only) |
+| Thêm dependency | `project.json` → tech_stack |
+| Fix bug / gặp gotcha | `knowledge.json` → gotchas (append) |
+| Pattern mới | `knowledge.json` → patterns (append) |
+| Feature mới done | `features.json` → modules.[module] |
 | Đang làm task | `session.json` → working_on |
-| Hoàn thành task | `session.json` → pending_tasks, recent_changes |
-| Cuối ngày | Cả hai |
-| **Thay đổi server/port** | `brain.json` → **infrastructure** (MERGE, không xóa) |
-| **Config GitHub** | `brain.json` → **github** (MERGE, không xóa) |
-| **Lần đầu save-brain** | Hỏi user infra data + GitHub config |
+| Hoàn thành task | `session.json` → recent_changes (max 10) |
+| Cuối ngày | Tất cả files nếu cần |
 
-### 6.5. Các bước tạo/update
+### 6.5. Auto-prune rules
 
-**Bước 1: Update brain.json (nếu có thay đổi project)**
+```
+session.json → recent_changes:
+  - Giữ tối đa 10 entries
+  - Khi thêm entry mới mà đã đủ 10 → xóa cũ nhất
+
+knowledge.json:
+  - decisions, patterns, gotchas → APPEND ONLY (không xóa)
+  - conventions → update khi thay đổi
+
+features.json:
+  - Chỉ update status, không xóa features cũ
+```
+
+### 6.6. Các bước tạo/update
+
+**Bước 1: Update project.json (nếu có thay đổi infra/stack)**
 - Scan `package.json` → tech_stack
-- Scan `prisma/schema.prisma` → database_schema
-- Scan `src/app/api/**` → api_endpoints
-- Scan `docs/specs/*.md` → features
+- Check .env → infrastructure
+- Update meta.last_saved + save_count
 
-**Bước 2: Update session.json (luôn update)**
-- Files đã modified → recent_changes
-- Task đang làm → working_on
-- Errors gặp phải → errors_encountered
-- Quyết định đã lấy → decisions_made
+**Bước 2: Update knowledge.json (nếu có kiến thức mới)**
+- Append gotchas/patterns mới
+- Append decisions mới
 
-**Bước 3: Validate**
-- Schema: `schemas/brain.schema.json`, `schemas/session.schema.json`
-- Đảm bảo JSON hợp lệ trước khi save
+**Bước 3: Update features.json (nếu feature mới hoàn thành)**
+- Update modules.[module].status
+- Add feature mới vào module tương ứng
 
-**Bước 4: Save**
-- `.brain/brain.json` - add vào `.gitignore` hoặc commit nếu team share
-- `.brain/session.json` - luôn trong `.gitignore` (local state)
+**Bước 4: Update session.json (luôn update)**
+- working_on → task hiện tại
+- recent_changes → append (max 10)
+
+**Bước 5: Validate JSON**
+- Đảm bảo tất cả files hợp lệ trước khi save
 
 ---
 
