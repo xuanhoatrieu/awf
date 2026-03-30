@@ -71,9 +71,8 @@ Step 4: Load Session State
     → Đọc 20 dòng cuối để biết context gần nhất
 
 Step 5: 🔍 GitNexus Code Intelligence (NẾU CÓ .gitnexus/)
-├── query("overview") → Clusters, flows, key modules
-├── cypher("MATCH (c:Cluster) RETURN c.name, c.size ORDER BY c.size DESC LIMIT 10")
-│   → Top 10 modules lớn nhất trong dự án
+├── Chạy: npx gitnexus status          → Index stats (nodes, edges, clusters)
+├── Chạy: npx gitnexus query "overview" → Clusters, flows, key modules
 └── Hiển thị:
     📊 Code Graph: X nodes | Y edges | Z clusters
     🔑 Key modules: [top 5 clusters by size]

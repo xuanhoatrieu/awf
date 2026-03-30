@@ -69,8 +69,8 @@ if technical_level == "newbie":
 
 ### 1.3. 🔍 GitNexus Blast Radius Analysis (Auto-trigger)
 *   Nếu có `.gitnexus/` → Tự động chạy:
-    ```
-    impact({ target: "[function/file cần refactor]", direction: "upstream" })
+    ```bash
+    cd [project_root] && npx gitnexus query "[function/file cần refactor]"
     ```
 *   Hiển thị:
     ```

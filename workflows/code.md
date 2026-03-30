@@ -105,19 +105,19 @@ Khi code mỗi task:
 ## Giai đoạn 2.5: 🔍 GitNexus Context Lookup (Auto-trigger)
 
 Nếu có `.gitnexus/` → Trước khi code, tự động chạy:
-```
+```bash
 # Tìm hiểu symbol/module liên quan đến task
-context({ name: "[function/class cần sửa/thêm]" })
+cd [project_root] && npx gitnexus query "[function/class cần sửa/thêm]"
 
 # Hoặc search semantic
-query({ query: "[mô tả task]" })
+cd [project_root] && npx gitnexus query "[mô tả task]"
 ```
 Kết quả giúp:
 - Hiểu incoming/outgoing relationships trước khi code
 - Tránh tạo code trùng lặp với logic có sẵn
 - Biết đúng chỗ cần sửa (không phải grep thủ công)
 
-**Sau khi code xong mỗi phase:** Chạy `detect_changes()` để verify blast radius.
+**Sau khi code xong mỗi phase:** Chạy `npx gitnexus analyze` để re-index.
 
 ---
 

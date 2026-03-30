@@ -131,16 +131,16 @@ Sau khi có thông tin từ User, AI tự thân vận động:
 
 ### 2.2.5. 🔍 GitNexus Call Chain Tracing (Auto-trigger)
 *   Nếu có `.gitnexus/` → Tự động chạy:
-    ```
-    context({ name: "[function/symbol liên quan đến lỗi]" })
+    ```bash
+    cd [project_root] && npx gitnexus query "[function/symbol liên quan đến lỗi]"
     ```
 *   Kết quả giúp xác định:
     - Ai gọi function bị lỗi (incoming calls)
     - Function bị lỗi gọi ai (outgoing calls)
     - Thuộc process/flow nào
 *   Nếu cần mở rộng:
-    ```
-    query({ query: "[keyword liên quan đến lỗi]" })
+    ```bash
+    cd [project_root] && npx gitnexus query "[keyword liên quan đến lỗi]"
     ```
 
 ### 2.3. Hypothesis Formation (Đặt giả thuyết)

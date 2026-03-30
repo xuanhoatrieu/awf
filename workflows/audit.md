@@ -133,15 +133,11 @@ if technical_level == "newbie":
 
 ### 2.4.5. 🔍 GitNexus Code Intelligence Audit (Auto-trigger)
 Nếu có `.gitnexus/` → Tự động chạy:
-```
-# Dead code detection
-cypher("MATCH (s:Symbol) WHERE NOT ()-[:CALLS]->(s) AND s.kind = 'Function' AND NOT s.name STARTS WITH 'export' RETURN s.name, s.filePath LIMIT 20")
-
-# Circular dependencies
-cypher("MATCH (a:Symbol)-[:IMPORTS]->(b:Symbol)-[:IMPORTS]->(a) RETURN a.filePath, b.filePath")
-
-# API surface analysis (all exported symbols)
-cypher("MATCH (s:Symbol) WHERE s.exported = true RETURN s.kind, count(s) AS cnt")
+```bash
+# Tìm dead code, circular dependencies, API surface
+cd [project_root] && npx gitnexus query "unused functions"
+cd [project_root] && npx gitnexus query "circular dependencies"
+cd [project_root] && npx gitnexus query "exported symbols"
 ```
 Kết quả bổ sung vào báo cáo audit:
 - **Dead functions:** Functions không ai gọi

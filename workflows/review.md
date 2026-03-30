@@ -77,12 +77,10 @@ AI tự động thực hiện:
 
 ### 2.5. 🔍 GitNexus Deep Analysis (Auto-trigger)
 Nếu có `.gitnexus/` → Tự động chạy:
-```
-query("overview")                    → Clusters, flows, key modules
-cypher("MATCH (s:Symbol) RETURN s.kind, count(s) AS cnt ORDER BY cnt DESC")
-                                     → Phân tích cấu trúc code
-cypher("MATCH (f:Symbol)-[:CALLS]->(g:Symbol) WHERE f.filePath <> g.filePath RETURN f.filePath, g.filePath, count(*) AS calls ORDER BY calls DESC LIMIT 10")
-                                     → Top cross-file dependencies
+```bash
+cd [project_root] && npx gitnexus status            # Index stats
+cd [project_root] && npx gitnexus query "overview"   # Clusters, flows, key modules
+cd [project_root] && npx gitnexus query "cross-file dependencies"  # Top dependencies
 ```
 Kết quả bổ sung vào báo cáo:
 - **Code Graph Stats:** nodes, edges, clusters
