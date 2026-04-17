@@ -1,6 +1,6 @@
 #!/bin/bash
 # AWF Installer for Mac/Linux — xuanhoatrieu fork v4.1
-# Includes: Workflows + Skills + GitNexus Code Intelligence
+# Includes: Workflows + Skills + Graphify Code Intelligence
 
 REPO_URL="https://raw.githubusercontent.com/xuanhoatrieu/awf/main"
 
@@ -18,7 +18,7 @@ SKILLS=(
     "awf-auto-save"
     "awf-context-help"
     "awf-error-translator"
-    "awf-gitnexus"
+    "awf-graphify"
     "awf-onboarding"
     "awf-session-restore"
 )
@@ -32,7 +32,7 @@ echo ""
 echo "╔══════════════════════════════════════════════════════════╗"
 echo "║  🚀 AWF - Antigravity Workflow Framework v4.1            ║"
 echo "║  📦 By xuanhoatrieu (forked + customized)                ║"
-echo "║  🔍 Includes: GitNexus Code Intelligence                 ║"
+echo "║  🔍 Includes: Graphify Code Intelligence                  ║"
 echo "╚══════════════════════════════════════════════════════════╝"
 echo ""
 
@@ -72,19 +72,21 @@ done
 echo ""
 
 # ==============================
-# 3. Install GitNexus (Global)
+# 3. Install Graphify (Global)
 # ==============================
-echo "⏳ Cài đặt GitNexus Code Intelligence..."
-if command -v npm &> /dev/null; then
-    npm install -g gitnexus@latest 2>/dev/null
-    if command -v gitnexus &> /dev/null || npx gitnexus --version &> /dev/null; then
-        echo "   ✅ GitNexus installed globally"
+echo "⏳ Cài đặt Graphify Code Intelligence..."
+if command -v pip3 &> /dev/null || command -v pip &> /dev/null; then
+    PIP_CMD=$(command -v pip3 || command -v pip)
+    $PIP_CMD install graphifyy 2>/dev/null
+    if command -v graphify &> /dev/null; then
+        echo "   ✅ Graphify installed ($(graphify --version 2>/dev/null || echo 'latest'))"
     else
-        echo "   ⚠️  GitNexus sẽ dùng npx (không cần install global)"
+        echo "   ⚠️  Graphify cài xong nhưng chưa thấy trong PATH"
+        echo "   💡 Thử: pip3 install graphifyy"
     fi
 else
-    echo "   ⚠️  npm không có. GitNexus cần Node.js >= 18"
-    echo "   💡 Cài Node.js: https://nodejs.org/"
+    echo "   ⚠️  pip không có. Graphify cần Python >= 3.10"
+    echo "   💡 Cài Python: https://www.python.org/downloads/"
 fi
 echo ""
 
@@ -104,7 +106,7 @@ Khi user gõ các lệnh bắt đầu bằng `/` dưới đây, đây là AWF WO
 - /deploy, /rollback, /save-brain, /recap, /next, /help, /customize
 
 ## Skills (auto-trigger):
-- awf-gitnexus: Code Intelligence via GitNexus (auto on /refactor, /review, /debug, /audit, /recap, /code)
+- awf-graphify: Code Intelligence via Graphify (auto on /refactor, /review, /debug, /audit, /recap, /code)
 - awf-session-restore: Context restore at session start
 - awf-auto-save: Auto-save on workflow end
 - awf-adaptive-language: Adjust language to user level
@@ -146,13 +148,13 @@ echo "🎉 HOÀN TẤT!"
 echo ""
 echo "   📋 Workflows: $wf_success/${#WORKFLOWS[@]}"
 echo "   🧩 Skills:    $skill_success/${#SKILLS[@]}"
-echo "   🔍 GitNexus:  $(command -v gitnexus &> /dev/null && echo 'Installed' || echo 'Via npx')"
+echo "   🔍 Graphify:  $(command -v graphify &> /dev/null && echo 'Installed' || echo 'Not installed')"
 echo "   📌 Version:   4.1.0"
 echo ""
 echo "👉 Dùng ngay ở BẤT KỲ project nào!"
 echo "👉 Gõ '/plan' để test. Gõ '/recap' để xem context."
 echo ""
-echo "🔍 Để index codebase với GitNexus:"
-echo "   cd your-project && npx gitnexus analyze"
+echo "🔍 Để index codebase với Graphify:"
+echo "   cd your-project && graphify ."
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

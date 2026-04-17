@@ -129,18 +129,22 @@ Sau khi có thông tin từ User, AI tự thân vận động:
     *   Import thiếu
     *   Cú pháp sai
 
-### 2.2.5. 🔍 GitNexus Call Chain Tracing (Auto-trigger)
-*   Nếu có `.gitnexus/` → Tự động chạy:
+### 2.2.5. 🔍 Graphify Call Chain Tracing (Auto-trigger)
+*   Nếu có `graphify-out/` → Tự động chạy:
     ```bash
-    cd [project_root] && npx gitnexus query "[function/symbol liên quan đến lỗi]"
+    cd [project_root] && graphify query "[function/symbol liên quan đến lỗi]" --graph graphify-out/graph.json
     ```
 *   Kết quả giúp xác định:
     - Ai gọi function bị lỗi (incoming calls)
     - Function bị lỗi gọi ai (outgoing calls)
-    - Thuộc process/flow nào
-*   Nếu cần mở rộng:
+    - Thuộc process/flow nào, community nào
+*   Trace path giữa 2 symbols:
     ```bash
-    cd [project_root] && npx gitnexus query "[keyword liên quan đến lỗi]"
+    cd [project_root] && graphify path "[symbol nguồn]" "[symbol đích]"
+    ```
+*   Giải thích 1 symbol cụ thể:
+    ```bash
+    cd [project_root] && graphify explain "[symbol liên quan đến lỗi]"
     ```
 
 ### 2.3. Hypothesis Formation (Đặt giả thuyết)

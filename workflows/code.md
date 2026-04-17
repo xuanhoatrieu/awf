@@ -102,22 +102,23 @@ Khi code mỗi task:
 
 ---
 
-## Giai đoạn 2.5: 🔍 GitNexus Context Lookup (Auto-trigger)
+## Giai đoạn 2.5: 🔍 Graphify Context Lookup (Auto-trigger)
 
-Nếu có `.gitnexus/` → Trước khi code, tự động chạy:
+Nếu có `graphify-out/` → Trước khi code, tự động chạy:
 ```bash
 # Tìm hiểu symbol/module liên quan đến task
-cd [project_root] && npx gitnexus query "[function/class cần sửa/thêm]"
+cd [project_root] && graphify query "[function/class cần sửa/thêm]" --graph graphify-out/graph.json
 
 # Hoặc search semantic
-cd [project_root] && npx gitnexus query "[mô tả task]"
+cd [project_root] && graphify query "[mô tả task]" --graph graphify-out/graph.json
 ```
 Kết quả giúp:
 - Hiểu incoming/outgoing relationships trước khi code
 - Tránh tạo code trùng lặp với logic có sẵn
 - Biết đúng chỗ cần sửa (không phải grep thủ công)
+- Xem god nodes và community structure từ `GRAPH_REPORT.md`
 
-**Sau khi code xong mỗi phase:** Chạy `npx gitnexus analyze` để re-index.
+**Sau khi code xong mỗi phase:** Chạy `graphify . --update` để re-index (chỉ changed files).
 
 ---
 

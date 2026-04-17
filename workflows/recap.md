@@ -75,12 +75,13 @@ Step 4: Load Session State
 └── .brain/session_log.txt              # Append-only log 🆕
     → Đọc 20 dòng cuối để biết context gần nhất
 
-Step 5: 🔍 GitNexus Code Intelligence (NẾU CÓ .gitnexus/)
-├── Chạy: npx gitnexus status          → Index stats (nodes, edges, clusters)
-├── Chạy: npx gitnexus query "overview" → Clusters, flows, key modules
+Step 5: 🔍 Graphify Knowledge Graph (NẾU CÓ graphify-out/)
+├── Đọc: graphify-out/GRAPH_REPORT.md  → God nodes, communities, surprising connections
+├── Chạy: graphify query "overview" --graph graphify-out/graph.json → Key modules, flows
 └── Hiển thị:
-    📊 Code Graph: X nodes | Y edges | Z clusters
-    🔑 Key modules: [top 5 clusters by size]
+    📊 Knowledge Graph: X nodes | Y edges | Z communities
+    🔑 God nodes: [top 5 highest-degree concepts]
+    🏘️ Communities: [top clusters by size]
     🔄 Main flows: [entry points → process chains]
 
 Step 6: Generate Summary
@@ -144,10 +145,11 @@ Trích xuất từ cả 2 files:
    └─ Branch: {github.default_branch}
    └─ ⚠️ Commit rule: LUÔN HỎI TRƯỚC KHI COMMIT
 
-🔍 **GitNexus:** (nếu có .gitnexus/)
-   └─ Code Graph: X nodes | Y edges | Z clusters
-   └─ Key modules: [top 5 clusters]
-   └─ Main flows: [entry points]
+🔍 **Graphify:** (nếu có graphify-out/)
+   └─ Knowledge Graph: X nodes | Y edges | Z communities
+   └─ God nodes: [top 5 concepts]
+   └─ Communities: [top clusters]
+   └─ Interactive: graphify-out/graph.html
 
 📊 **Stats:** {brain.database_schema.tables.length} tables | {brain.api_endpoints.length} APIs | {brain.features.length} features
 

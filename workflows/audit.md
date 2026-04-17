@@ -131,18 +131,19 @@ if technical_level == "newbie":
 *   Có package nào có known vulnerabilities?
 *   Có package nào không dùng?
 
-### 2.4.5. 🔍 GitNexus Code Intelligence Audit (Auto-trigger)
-Nếu có `.gitnexus/` → Tự động chạy:
+### 2.4.5. 🔍 Graphify Code Intelligence Audit (Auto-trigger)
+Nếu có `graphify-out/` → Tự động chạy:
 ```bash
 # Tìm dead code, circular dependencies, API surface
-cd [project_root] && npx gitnexus query "unused functions"
-cd [project_root] && npx gitnexus query "circular dependencies"
-cd [project_root] && npx gitnexus query "exported symbols"
+cd [project_root] && graphify query "unused functions" --graph graphify-out/graph.json
+cd [project_root] && graphify query "circular dependencies" --graph graphify-out/graph.json
+cd [project_root] && graphify query "exported symbols" --graph graphify-out/graph.json
 ```
 Kết quả bổ sung vào báo cáo audit:
-- **Dead functions:** Functions không ai gọi
+- **Dead functions:** Functions không ai gọi (low-degree nodes)
 - **Circular deps:** Import vòng tròn
 - **API surface:** Tổng exported symbols
+- **God nodes:** Symbols có quá nhiều connections (potential refactor targets)
 
 ### 2.5. Documentation Audit
 *   README có up-to-date không?

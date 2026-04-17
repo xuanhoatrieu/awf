@@ -67,10 +67,11 @@ if technical_level == "newbie":
 ### 1.2. Cam kết an toàn
 *   "Em cam kết: **Logic nghiệp vụ giữ nguyên 100%**. Chỉ thay đổi cách viết, không thay đổi cách chạy."
 
-### 1.3. 🔍 GitNexus Blast Radius Analysis (Auto-trigger)
-*   Nếu có `.gitnexus/` → Tự động chạy:
+### 1.3. 🔍 Graphify Blast Radius Analysis (Auto-trigger)
+*   Nếu có `graphify-out/` → Tự động chạy:
     ```bash
-    cd [project_root] && npx gitnexus query "[function/file cần refactor]"
+    cd [project_root] && graphify query "[function/file cần refactor]" --graph graphify-out/graph.json
+    cd [project_root] && graphify explain "[symbol cần refactor]"
     ```
 *   Hiển thị:
     ```
@@ -78,8 +79,10 @@ if technical_level == "newbie":
     📦 Target: [symbol name]
     ⬆️ Upstream (phụ thuộc vào target): X symbols
     ⬇️ Downstream (target phụ thuộc): Y symbols
+    🏘️ Community: [community name/cluster]
     ⚠️ Risk level: [Low/Medium/High]
     ```
+*   Trace path tới symbol liên quan: `graphify path "[source]" "[target]"`
 *   Nếu risk = High → Cảnh báo: "Refactor này ảnh hưởng nhiều file. Nên tạo backup branch."
 
 ### 1.4. Backup Suggestion

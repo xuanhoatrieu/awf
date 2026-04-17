@@ -75,17 +75,20 @@ AI tự động thực hiện:
 # Context đang làm việc
 ```
 
-### 2.5. 🔍 GitNexus Deep Analysis (Auto-trigger)
-Nếu có `.gitnexus/` → Tự động chạy:
+### 2.5. 🔍 Graphify Deep Analysis (Auto-trigger)
+Nếu có `graphify-out/` → Tự động chạy:
 ```bash
-cd [project_root] && npx gitnexus status            # Index stats
-cd [project_root] && npx gitnexus query "overview"   # Clusters, flows, key modules
-cd [project_root] && npx gitnexus query "cross-file dependencies"  # Top dependencies
+# Đọc report tổng quan (god nodes, communities, surprising connections)
+cat [project_root]/graphify-out/GRAPH_REPORT.md
+
+# Query cross-file dependencies
+cd [project_root] && graphify query "cross-file dependencies" --graph graphify-out/graph.json
 ```
 Kết quả bổ sung vào báo cáo:
-- **Code Graph Stats:** nodes, edges, clusters
-- **Hot files:** Files có nhiều cross-references nhất
-- **Dependency map:** Module nào phụ thuộc module nào
+- **God Nodes:** Highest-degree concepts (what everything connects through)
+- **Communities:** Code clusters theo Leiden algorithm
+- **Surprising Connections:** Cross-module links ranked by composite score
+- **Interactive Graph:** Link tới `graphify-out/graph.html` để xem trực quan
 
 ---
 

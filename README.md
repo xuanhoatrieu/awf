@@ -9,10 +9,10 @@
 |---------|-----------------|-------------------|
 | Workflows | 14 commands | **21 commands** (+review, brainstorm, design, help, next, customize, awf-update) |
 | Skills | ❌ None | **7 auto-trigger skills** |
-| GitNexus | ❌ None | **✅ Code Intelligence** (knowledge graph, impact analysis) |
+| GitNexus | ❌ None | ~~GitNexus~~ → **✅ Graphify** (knowledge graph, impact analysis, multimodal) |
 | Infrastructure Data | ❌ None | **✅ Persistent** (IP, port, DB, GitHub rules) |
 | Save-Brain | Basic | **✅ Merge rules** (never overwrite infra/github data) |
-| Recap | Basic | **✅ Infra + GitNexus + brain.json** |
+| Recap | Basic | **✅ Infra + Graphify + brain.json** |
 | GitHub Rules | ❌ None | **✅ Always ask before commit/push** |
 
 ## 📦 Installation
@@ -30,7 +30,7 @@ iex "& { $(irm https://raw.githubusercontent.com/xuanhoatrieu/awf/main/install.p
 ### What gets installed:
 - **21 Workflows** → `~/.gemini/antigravity/global_workflows/`
 - **7 Skills** → `~/.gemini/antigravity/skills/`
-- **GitNexus** → Global npm package (for codebase intelligence)
+- **Graphify** → Python package (for codebase intelligence / knowledge graph)
 - **GEMINI.md** → Updated global rules
 
 ## 🎮 Quick Start
@@ -49,30 +49,31 @@ iex "& { $(irm https://raw.githubusercontent.com/xuanhoatrieu/awf/main/install.p
 /audit       → Kiểm tra bảo mật
 /deploy      → Deploy production
 /save-brain  → Lưu kiến thức (+ infra, GitHub rules)
-/recap       → Khôi phục context (+ GitNexus, infra)
+/recap       → Khôi phục context (+ Graphify, infra)
 ```
 
-## 🔍 GitNexus Integration
+## 🔍 Graphify Integration
 
-GitNexus xây dựng knowledge graph cho codebase — auto-activates trong:
-- `/recap` — overview cấu trúc dự án
+Graphify xây dựng knowledge graph cho codebase — auto-activates trong:
+- `/recap` — overview cấu trúc dự án (god nodes, communities)
 - `/refactor` — blast radius analysis
-- `/debug` — trace call chains
+- `/debug` — trace call chains (`graphify path`)
 - `/review` — deep code analysis
 - `/audit` — dead code + circular deps
 - `/code` — context lookup trước khi code
 
 ### Index dự án:
 ```bash
+pip install graphifyy
 cd your-project
-npx gitnexus analyze
+graphify .
 ```
 
 ## 🧩 Skills (Auto-trigger)
 
 | Skill | Trigger | Chức năng |
 |-------|---------|-----------|
-| awf-gitnexus | /recap, /refactor, /debug, /review, /audit, /code | Code Intelligence |
+| awf-graphify | /recap, /refactor, /debug, /review, /audit, /code | Code Intelligence (Graphify Knowledge Graph) |
 | awf-session-restore | Đầu session | Context restore |
 | awf-auto-save | Workflow end | Auto-save progress |
 | awf-adaptive-language | Đầu session | Điều chỉnh ngôn ngữ theo level |
@@ -94,7 +95,7 @@ npx gitnexus analyze
 awf/
 ├── workflows/          # 21 workflow .md files
 ├── skills/             # 7 auto-trigger skills
-│   ├── awf-gitnexus/
+│   ├── awf-graphify/
 │   ├── awf-session-restore/
 │   └── ...
 ├── install.sh          # Linux/Mac installer

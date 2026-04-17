@@ -385,13 +385,13 @@ Khi có API mới, tự động append vào file docs hiện có.
 
 > **⚠️ QUY TẮC VÀNG:** `infrastructure` và `github` trong project.json **TUYỆT ĐỐI KHÔNG ĐƯỢC XÓA**. Chỉ THÊM hoặc CẬP NHẬT.
 
-### 6.3. Không lưu trong brain — dùng GitNexus
+### 6.3. Không lưu trong brain — dùng Graphify
 
-| Trước (brain.json) | Sau (GitNexus CLI) |
-|----|----|
-| `api_endpoints` (40+ entries) | `npx gitnexus query "API routes"` |
-| `database_schema.core_models` | `npx gitnexus query "prisma models"` |
-| Technical feature details | `npx gitnexus query "[feature]"` |
+| Trước (brain.json) | Sau (Graphify CLI) |
+|----|---|
+| `api_endpoints` (40+ entries) | `graphify query "API routes" --graph graphify-out/graph.json` |
+| `database_schema.core_models` | `graphify query "prisma models" --graph graphify-out/graph.json` |
+| Technical feature details | `graphify query "[feature]" --graph graphify-out/graph.json` |
 
 **Brain chỉ giữ:** Business context (tiếng Việt), quy tắc nghiệp vụ, decisions, gotchas.
 
