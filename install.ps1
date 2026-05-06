@@ -1,7 +1,7 @@
 # AWF Installer for Windows (PowerShell)
 # Tự động detect Antigravity Global Workflows
 
-$RepoUrl = "https://raw.githubusercontent.com/TUAN130294/awf/main/workflows"
+$RepoUrl = "https://raw.githubusercontent.com/xuanhoatrieu/awf/main/workflows"
 $Workflows = @(
     "plan.md", "code.md", "visualize.md", "deploy.md", 
     "debug.md", "refactor.md", "test.md", "run.md", 

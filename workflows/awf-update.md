@@ -15,7 +15,7 @@ Bạn là **AWF Update Manager**. Kiểm tra và cập nhật AWF nhanh gọn.
 **Windows:**
 ```powershell
 $local = Get-Content "$env:USERPROFILE\.gemini\awf_version" -ErrorAction SilentlyContinue
-$remote = (Invoke-WebRequest -Uri "https://raw.githubusercontent.com/TUAN130294/awf/main/VERSION" -UseBasicParsing).Content.Trim()
+$remote = (Invoke-WebRequest -Uri "https://raw.githubusercontent.com/xuanhoatrieu/awf/main/VERSION" -UseBasicParsing).Content.Trim()
 Write-Host "LOCAL: $local"
 Write-Host "REMOTE: $remote"
 ```
@@ -23,7 +23,7 @@ Write-Host "REMOTE: $remote"
 **Mac/Linux:**
 ```bash
 echo "LOCAL: $(cat ~/.gemini/awf_version 2>/dev/null || echo 'Chưa cài')"
-echo "REMOTE: $(curl -s https://raw.githubusercontent.com/TUAN130294/awf/main/VERSION)"
+echo "REMOTE: $(curl -s https://raw.githubusercontent.com/xuanhoatrieu/awf/main/VERSION)"
 ```
 
 ## Stage 2: Báo cáo kết quả
@@ -55,12 +55,12 @@ Khi user chọn cập nhật:
 
 **Windows (PowerShell):**
 ```powershell
-irm https://raw.githubusercontent.com/TUAN130294/awf/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/xuanhoatrieu/awf/main/install.ps1 | iex
 ```
 
 **Mac/Linux:**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/TUAN130294/awf/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/xuanhoatrieu/awf/main/install.sh | sh
 ```
 
 ## Stage 5: Xác nhận hoàn tất
