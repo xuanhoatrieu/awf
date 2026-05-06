@@ -1,0 +1,11 @@
+# This file is used internally by FFMPEG.
+file 'file:G:/My Drive/1Work/BoMon_Tin/6_Deep_learning/.agents/skills/awf-video/templates/media/videos/test_latex/480p15/partial_movie_files/TestLatex/1086306999_4237538416_223132457.mp4'
+file 'file:G:/My Drive/1Work/BoMon_Tin/6_Deep_learning/.agents/skills/awf-video/templates/media/videos/test_latex/480p15/partial_movie_files/TestLatex/4183175614_3201849554_829055071.mp4'
+file 'file:G:/My Drive/1Work/BoMon_Tin/6_Deep_learning/.agents/skills/awf-video/templates/media/videos/test_latex/480p15/partial_movie_files/TestLatex/4183175614_3821376284_1906723349.mp4'
+file 'file:G:/My Drive/1Work/BoMon_Tin/6_Deep_learning/.agents/skills/awf-video/templates/media/videos/test_latex/480p15/partial_movie_files/TestLatex/4183175614_3677501232_3843564529.mp4'
+file 'file:G:/My Drive/1Work/BoMon_Tin/6_Deep_learning/.agents/skills/awf-video/templates/media/videos/test_latex/480p15/partial_movie_files/TestLatex/4183175614_3201849554_2259882023.mp4'
+file 'file:G:/My Drive/1Work/BoMon_Tin/6_Deep_learning/.agents/skills/awf-video/templates/media/videos/test_latex/480p15/partial_movie_files/TestLatex/4183175614_3495579846_3718343490.mp4'
+file 'file:G:/My Drive/1Work/BoMon_Tin/6_Deep_learning/.agents/skills/awf-video/templates/media/videos/test_latex/480p15/partial_movie_files/TestLatex/4183175614_3201849554_4018435215.mp4'
+file 'file:G:/My Drive/1Work/BoMon_Tin/6_Deep_learning/.agents/skills/awf-video/templates/media/videos/test_latex/480p15/partial_movie_files/TestLatex/4183175614_2298723433_109083123.mp4'
+file 'file:G:/My Drive/1Work/BoMon_Tin/6_Deep_learning/.agents/skills/awf-video/templates/media/videos/test_latex/480p15/partial_movie_files/TestLatex/4183175614_3201849554_59704448.mp4'
+file 'file:G:/My Drive/1Work/BoMon_Tin/6_Deep_learning/.agents/skills/awf-video/templates/media/videos/test_latex/480p15/partial_movie_files/TestLatex/4183175614_1839128356_1617333387.mp4'
