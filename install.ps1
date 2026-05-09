@@ -1,6 +1,7 @@
-# AWF Installer for Windows (PowerShell)
-# xuanhoatrieu fork v4.2
-# Includes: Workflows + Skills (with scripts/templates) + Graphify
+# AWF - Antigravity Workflow Framework v4.2
+# Installer for Windows (PowerShell)
+# By xuanhoatrieu (forked + customized)
+# Includes: Workflows + Skills + Graphify + Harness Integration
 
 $RepoUrl = "https://raw.githubusercontent.com/xuanhoatrieu/awf/main"
 
@@ -62,7 +63,7 @@ Write-Host ""
 Write-Host "================================================================" -ForegroundColor Cyan
 Write-Host "  AWF - Antigravity Workflow Framework v4.2                     " -ForegroundColor Cyan
 Write-Host "  By xuanhoatrieu (forked + customized)                         " -ForegroundColor Cyan
-Write-Host "  Includes: Graphify + PPTX + Video + Question-Gen              " -ForegroundColor Cyan
+Write-Host "  Graphify + PPTX + Video + Question-Gen + Harness              " -ForegroundColor Cyan
 Write-Host "================================================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -167,7 +168,8 @@ $AwfInstructions = @"
 # AWF - Antigravity Workflow Framework v4.2
 
 ## CRITICAL: Command Recognition
-Khi user dung lenh /, hay doc file workflow tuong ung trong ~/.gemini/antigravity/global_workflows/:
+Khi user go cac lenh bat dau bang ``/`` duoi day, day la AWF WORKFLOW COMMANDS.
+Doc file workflow tuong ung trong ~/.gemini/antigravity/global_workflows/:
 
 ## Commands:
 - /init, /plan, /design, /visualize, /brainstorm
@@ -176,7 +178,7 @@ Khi user dung lenh /, hay doc file workflow tuong ung trong ~/.gemini/antigravit
 - /export, /textbook, /pptx, /question, /video
 
 ## Skills (auto-trigger):
-- awf-graphify: Code Intelligence via Graphify
+- awf-graphify: Code Intelligence via Graphify (auto on /refactor, /review, /debug, /audit, /recap, /code)
 - awf-session-restore: Context restore at session start
 - awf-auto-save: Auto-save on workflow end
 - awf-adaptive-language: Adjust language to user level
@@ -187,6 +189,17 @@ Khi user dung lenh /, hay doc file workflow tuong ung trong ~/.gemini/antigravit
 - awf-question-gen: Auto quiz generation (iSpring, Review, Moodle)
 - awf-pptx: PPTX slide generation with TTS
 - awf-video: ML animation with ManimCE + ManimGL
+
+## Harness Integration:
+Khi du an co docs/FEATURE_INTAKE.md hoac docs/HARNESS.md, agent PHAI:
+- Phan loai risk (tiny/normal/high-risk) truoc khi code
+- Tao story file cho normal+ tasks
+- Cap nhat docs/TEST_MATRIX.md khi them/sua test
+- Ghi decision record cho quyet dinh kien truc quan trong
+
+## PERSISTENT DATA:
+Muc ``infrastructure`` va ``github`` trong .brain/brain.json TUYET DOI KHONG DUOC XOA.
+Luon HOI truoc khi commit/push len GitHub.
 "@
 
 if (-not (Test-Path "$env:USERPROFILE\.gemini")) {
@@ -213,7 +226,21 @@ if (-not (Test-Path $GeminiMd)) {
 # ==============================
 Set-Content -Path "$env:USERPROFILE\.gemini\awf_version" -Value "4.2.0"
 
+# ==============================
+# 6. Harness Integration Notice
+# ==============================
 Write-Host ""
+Write-Host "Harness Integration" -ForegroundColor Cyan
+Write-Host "   Harness adds project-level docs for risk classification," -ForegroundColor White
+Write-Host "   story templates, and decision records." -ForegroundColor White
+Write-Host ""
+Write-Host "   To install Harness in a project (PowerShell):" -ForegroundColor White
+Write-Host '   Invoke-WebRequest -Uri "https://raw.githubusercontent.com/hoangnb24/harness-experimental/main/scripts/install-harness.sh" -OutFile "install-harness.sh"; bash install-harness.sh --merge --yes' -ForegroundColor DarkGray
+Write-Host ""
+
+# ==============================
+# Summary
+# ==============================
 Write-Host "================================================================" -ForegroundColor DarkGray
 Write-Host "  DONE!" -ForegroundColor Yellow
 Write-Host ""
@@ -221,9 +248,13 @@ Write-Host "   Workflows: $wfSuccess/$($Workflows.Count)" -ForegroundColor White
 Write-Host "   Skills:    $skillSuccess/$($SkillNames.Count) ($skillFileCount files)" -ForegroundColor White
 $graphifyStatus = if (Get-Command graphify -ErrorAction SilentlyContinue) { "Installed" } else { "Not installed" }
 Write-Host "   Graphify:  $graphifyStatus" -ForegroundColor White
+Write-Host "   Harness:   Install per-project (see above)" -ForegroundColor White
 Write-Host "   Version:   4.2.0" -ForegroundColor White
 Write-Host ""
 Write-Host "  Use AWF in ANY project right now!" -ForegroundColor Cyan
-Write-Host "  Try: /plan, /recap, /code" -ForegroundColor White
+Write-Host "  Type: /plan, /recap, /code" -ForegroundColor White
+Write-Host ""
+Write-Host "  To index codebase with Graphify:" -ForegroundColor White
+Write-Host "  cd your-project; graphify update ." -ForegroundColor White
 Write-Host ""
 Write-Host "================================================================" -ForegroundColor DarkGray

@@ -1,8 +1,13 @@
-#!/bin/bash
-# AWF Installer for Mac/Linux — xuanhoatrieu fork v4.2
-# Includes: Workflows + Skills (with scripts/templates) + Graphify Code Intelligence
+#!/usr/bin/env bash
+# AWF - Antigravity Workflow Framework v4.2
+# Installer for Linux/macOS
+# By xuanhoatrieu (forked + customized)
+# Includes: Workflows + Skills + Graphify + Harness Integration
+
+set -euo pipefail
 
 REPO_URL="https://raw.githubusercontent.com/xuanhoatrieu/awf/main"
+HARNESS_INSTALLER="https://raw.githubusercontent.com/hoangnb24/harness-experimental/main/scripts/install-harness.sh"
 
 WORKFLOWS=(
     "plan.md" "code.md" "visualize.md" "deploy.md"
@@ -15,7 +20,6 @@ WORKFLOWS=(
     "README.md"
 )
 
-# Skills: name|subfiles (pipe-separated list of files relative to skill dir)
 # SKILL.md is always downloaded; extra files listed after |
 SKILL_NAMES=(
     "awf-adaptive-language"
@@ -45,7 +49,7 @@ echo ""
 echo "╔══════════════════════════════════════════════════════════╗"
 echo "║  🚀 AWF - Antigravity Workflow Framework v4.2            ║"
 echo "║  📦 By xuanhoatrieu (forked + customized)                ║"
-echo "║  🔍 Includes: Graphify + PPTX + Video + Question-Gen     ║"
+echo "║  🔍 Graphify + PPTX + Video + Question-Gen + Harness     ║"
 echo "╚══════════════════════════════════════════════════════════╝"
 echo ""
 
@@ -56,7 +60,7 @@ mkdir -p "$ANTIGRAVITY_GLOBAL"
 echo "📂 Workflows → $ANTIGRAVITY_GLOBAL"
 echo ""
 
-echo "⏳ Đang tải workflows..."
+echo "⏳ Downloading workflows..."
 wf_success=0
 for wf in "${WORKFLOWS[@]}"; do
     if curl -f -s -o "$ANTIGRAVITY_GLOBAL/$wf" "$REPO_URL/workflows/$wf"; then
@@ -71,12 +75,12 @@ echo ""
 # ==============================
 # 2. Install Skills
 # ==============================
-echo "⏳ Đang tải skills..."
+echo "⏳ Downloading skills..."
 skill_success=0
 skill_file_count=0
 for skill in "${SKILL_NAMES[@]}"; do
     mkdir -p "$ANTIGRAVITY_SKILLS/$skill"
-    
+
     # Always download SKILL.md
     if curl -f -s -o "$ANTIGRAVITY_SKILLS/$skill/SKILL.md" "$REPO_URL/skills/$skill/SKILL.md"; then
         echo "   ✅ $skill/SKILL.md"
@@ -86,9 +90,9 @@ for skill in "${SKILL_NAMES[@]}"; do
         echo "   ❌ $skill/SKILL.md"
         continue
     fi
-    
+
     # Download extra files if defined
-    extra="${SKILL_FILES[$skill]}"
+    extra="${SKILL_FILES[$skill]:-}"
     if [ -n "$extra" ]; then
         for file in $extra; do
             # Create subdirectory if needed
@@ -96,7 +100,7 @@ for skill in "${SKILL_NAMES[@]}"; do
             if [ "$subdir" != "." ]; then
                 mkdir -p "$ANTIGRAVITY_SKILLS/$skill/$subdir"
             fi
-            
+
             if curl -f -s -o "$ANTIGRAVITY_SKILLS/$skill/$file" "$REPO_URL/skills/$skill/$file"; then
                 echo "      📄 $file"
                 ((skill_file_count++))
@@ -109,28 +113,29 @@ done
 echo ""
 
 # ==============================
-# 3. Install Graphify (Global)
+# 3. Install Graphify
 # ==============================
-echo "⏳ Cài đặt Graphify Code Intelligence..."
+echo "⏳ Installing Graphify Code Intelligence..."
 if command -v pip3 &> /dev/null || command -v pip &> /dev/null; then
     PIP_CMD=$(command -v pip3 || command -v pip)
     $PIP_CMD install graphifyy 2>/dev/null
     if command -v graphify &> /dev/null; then
         echo "   ✅ Graphify installed ($(graphify --version 2>/dev/null || echo 'latest'))"
     else
-        echo "   ⚠️  Graphify cài xong nhưng chưa thấy trong PATH"
-        echo "   💡 Thử: pip3 install graphifyy"
+        echo "   ⚠️  Graphify installed but not in PATH"
+        echo "   💡 Try: pip3 install graphifyy"
     fi
 else
-    echo "   ⚠️  pip không có. Graphify cần Python >= 3.10"
-    echo "   💡 Cài Python: https://www.python.org/downloads/"
+    echo "   ⚠️  pip not found. Graphify needs Python >= 3.10"
+    echo "   💡 Install Python: https://www.python.org/downloads/"
 fi
 echo ""
 
 # ==============================
-# 4. Update Global Rules
+# 4. Update Global Rules (GEMINI.md)
 # ==============================
 AWF_INSTRUCTIONS='
+
 # AWF - Antigravity Workflow Framework v4.2
 
 ## CRITICAL: Command Recognition
@@ -156,6 +161,13 @@ Khi user gõ các lệnh bắt đầu bằng `/` dưới đây, đây là AWF WO
 - awf-pptx: PPTX slide generation with TTS
 - awf-video: ML animation with ManimCE + ManimGL
 
+## Harness Integration:
+Khi dự án có docs/FEATURE_INTAKE.md hoặc docs/HARNESS.md, agent PHẢI:
+- Phân loại risk (tiny/normal/high-risk) trước khi code
+- Tạo story file cho normal+ tasks
+- Cập nhật docs/TEST_MATRIX.md khi thêm/sửa test
+- Ghi decision record cho quyết định kiến trúc quan trọng
+
 ## PERSISTENT DATA:
 Mục `infrastructure` và `github` trong .brain/brain.json TUYỆT ĐỐI KHÔNG ĐƯỢC XÓA.
 Luôn HỎI trước khi commit/push lên GitHub.
@@ -164,7 +176,7 @@ Luôn HỎI trước khi commit/push lên GitHub.
 mkdir -p "$HOME/.gemini"
 if [ ! -f "$GEMINI_MD" ]; then
     echo "$AWF_INSTRUCTIONS" > "$GEMINI_MD"
-    echo "✅ Đã tạo Global Rules (GEMINI.md)"
+    echo "✅ Created Global Rules (GEMINI.md)"
 else
     # Remove old AWF block and add new one
     if grep -q "AWF - Antigravity Workflow Framework" "$GEMINI_MD"; then
@@ -172,31 +184,43 @@ else
         sed '/# AWF - Antigravity Workflow Framework/,/^# [^A]/{ /^# [^A]/!d; }' "$GEMINI_MD" > "$GEMINI_MD.tmp"
         echo "$AWF_INSTRUCTIONS" >> "$GEMINI_MD.tmp"
         mv "$GEMINI_MD.tmp" "$GEMINI_MD"
-        echo "✅ Đã cập nhật Global Rules (GEMINI.md)"
+        echo "✅ Updated Global Rules (GEMINI.md)"
     else
         echo "$AWF_INSTRUCTIONS" >> "$GEMINI_MD"
-        echo "✅ Đã thêm AWF vào Global Rules (GEMINI.md)"
+        echo "✅ Added AWF to Global Rules (GEMINI.md)"
     fi
 fi
 
-# ==============================
-# 5. Save AWF Version
-# ==============================
 echo "4.2.0" > "$HOME/.gemini/awf_version"
 
+# ==============================
+# 5. Harness Integration Notice
+# ==============================
 echo ""
+echo "🏗️  Harness Integration"
+echo "   Harness adds project-level docs for risk classification,"
+echo "   story templates, and decision records."
+echo ""
+echo "   To install Harness in a project:"
+echo '   curl -fsSL "https://raw.githubusercontent.com/hoangnb24/harness-experimental/main/scripts/install-harness.sh?$(date +%s)" | bash -s -- --merge --yes'
+echo ""
+
+# ==============================
+# Summary
+# ==============================
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "🎉 HOÀN TẤT!"
+echo "🎉 DONE!"
 echo ""
 echo "   📋 Workflows: $wf_success/${#WORKFLOWS[@]}"
 echo "   🧩 Skills:    $skill_success/${#SKILL_NAMES[@]} (${skill_file_count} files)"
 echo "   🔍 Graphify:  $(command -v graphify &> /dev/null && echo 'Installed' || echo 'Not installed')"
+echo "   🏗️  Harness:   Install per-project (see above)"
 echo "   📌 Version:   4.2.0"
 echo ""
-echo "👉 Dùng ngay ở BẤT KỲ project nào!"
-echo "👉 Gõ '/plan' để test. Gõ '/recap' để xem context."
+echo "👉 Use AWF in ANY project right now!"
+echo "👉 Type '/plan' to test. Type '/recap' to see context."
 echo ""
-echo "🔍 Để index codebase với Graphify:"
-echo "   cd your-project && graphify ."
+echo "🔍 To index codebase with Graphify:"
+echo "   cd your-project && graphify update ."
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
