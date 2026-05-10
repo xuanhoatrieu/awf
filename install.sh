@@ -92,7 +92,7 @@ wf_success=0
 for wf in "${WORKFLOWS[@]}"; do
     if curl -f -s -o "$ANTIGRAVITY_GLOBAL/$wf" "$REPO_URL/workflows/$wf"; then
         echo "   ✅ $wf"
-        ((wf_success++))
+        wf_success=$((wf_success + 1))
     else
         echo "   ❌ $wf"
     fi
@@ -111,8 +111,8 @@ for skill in "${SKILL_NAMES[@]}"; do
     # Always download SKILL.md
     if curl -f -s -o "$ANTIGRAVITY_SKILLS/$skill/SKILL.md" "$REPO_URL/skills/$skill/SKILL.md"; then
         echo "   ✅ $skill/SKILL.md"
-        ((skill_success++))
-        ((skill_file_count++))
+        skill_success=$((skill_success + 1))
+        skill_file_count=$((skill_file_count + 1))
     else
         echo "   ❌ $skill/SKILL.md"
         continue
@@ -130,7 +130,7 @@ for skill in "${SKILL_NAMES[@]}"; do
 
             if curl -f -s -o "$ANTIGRAVITY_SKILLS/$skill/$file" "$REPO_URL/skills/$skill/$file"; then
                 echo "      📄 $file"
-                ((skill_file_count++))
+                skill_file_count=$((skill_file_count + 1))
             else
                 echo "      ⚠️  $file (skipped)"
             fi
@@ -143,9 +143,15 @@ echo ""
 # 3. Install Graphify
 # ==============================
 echo "⏳ Installing Graphify Code Intelligence..."
-if command -v pip3 &> /dev/null || command -v pip &> /dev/null; then
-    PIP_CMD=$(command -v pip3 || command -v pip)
-    $PIP_CMD install graphifyy 2>/dev/null
+PIP_CMD=""
+if command -v pip3 &> /dev/null; then
+    PIP_CMD="pip3"
+elif command -v pip &> /dev/null; then
+    PIP_CMD="pip"
+fi
+
+if [ -n "$PIP_CMD" ]; then
+    $PIP_CMD install graphifyy 2>/dev/null || true
     if command -v graphify &> /dev/null; then
         echo "   ✅ Graphify installed ($(graphify --version 2>/dev/null || echo 'latest'))"
     else
@@ -173,7 +179,7 @@ for hf in "${HARNESS_FILES[@]}"; do
 
     if curl -f -s -o "$ANTIGRAVITY_HARNESS/$hf" "$REPO_URL/harness/$hf"; then
         echo "   ✅ $hf"
-        ((harness_success++))
+        harness_success=$((harness_success + 1))
     else
         echo "   ❌ $hf"
     fi
