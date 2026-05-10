@@ -54,9 +54,37 @@ $SkillFiles = @{
     )
 }
 
+# Harness template files
+$HarnessFiles = @(
+    "docs/FEATURE_INTAKE.md",
+    "docs/HARNESS.md",
+    "docs/ARCHITECTURE.md",
+    "docs/TEST_MATRIX.md",
+    "docs/GLOSSARY.md",
+    "docs/HARNESS_BACKLOG.md",
+    "docs/README.md",
+    "docs/product/README.md",
+    "docs/stories/README.md",
+    "docs/stories/backlog.md",
+    "docs/decisions/README.md",
+    "docs/decisions/0001-harness-first-development.md",
+    "docs/decisions/0002-post-spec-product-lifecycle.md",
+    "docs/decisions/0003-generic-spec-intake-harness.md",
+    "docs/templates/story.md",
+    "docs/templates/decision.md",
+    "docs/templates/spec-intake.md",
+    "docs/templates/validation-report.md",
+    "docs/templates/high-risk-story/overview.md",
+    "docs/templates/high-risk-story/design.md",
+    "docs/templates/high-risk-story/execplan.md",
+    "docs/templates/high-risk-story/validation.md",
+    "scripts-README.md"
+)
+
 # Detect paths
 $AntigravityGlobal = "$env:USERPROFILE\.gemini\antigravity\global_workflows"
 $AntigravitySkills = "$env:USERPROFILE\.gemini\antigravity\skills"
+$AntigravityHarness = "$env:USERPROFILE\.gemini\antigravity\harness"
 $GeminiMd = "$env:USERPROFILE\.gemini\GEMINI.md"
 
 Write-Host ""
@@ -161,6 +189,33 @@ if ($pipCmd) {
 Write-Host ""
 
 # ==============================
+# 4. Download Harness Templates
+# ==============================
+Write-Host "Downloading Harness templates..." -ForegroundColor Cyan
+if (-not (Test-Path $AntigravityHarness)) {
+    New-Item -ItemType Directory -Force -Path $AntigravityHarness | Out-Null
+}
+$harnessSuccess = 0
+foreach ($hf in $HarnessFiles) {
+    $subdir = Split-Path $hf -Parent
+    if ($subdir) {
+        $fullSubdir = "$AntigravityHarness\$subdir"
+        if (-not (Test-Path $fullSubdir)) {
+            New-Item -ItemType Directory -Force -Path $fullSubdir | Out-Null
+        }
+    }
+    try {
+        $fileUrl = "$RepoUrl/harness/$($hf -replace '\\','/')"
+        Invoke-WebRequest -Uri $fileUrl -OutFile "$AntigravityHarness\$hf" -ErrorAction Stop -UseBasicParsing
+        Write-Host "   OK  $hf" -ForegroundColor Green
+        $harnessSuccess++
+    } catch {
+        Write-Host "   FAIL  $hf" -ForegroundColor Red
+    }
+}
+Write-Host ""
+
+# ==============================
 # 4. Update Global Rules (GEMINI.md)
 # ==============================
 $AwfInstructions = @"
@@ -231,11 +286,8 @@ Set-Content -Path "$env:USERPROFILE\.gemini\awf_version" -Value "4.2.0"
 # ==============================
 Write-Host ""
 Write-Host "Harness Integration" -ForegroundColor Cyan
-Write-Host "   Harness adds project-level docs for risk classification," -ForegroundColor White
-Write-Host "   story templates, and decision records." -ForegroundColor White
-Write-Host ""
-Write-Host "   To install Harness in a project (PowerShell):" -ForegroundColor White
-Write-Host '   Invoke-WebRequest -Uri "https://raw.githubusercontent.com/hoangnb24/harness-experimental/main/scripts/install-harness.sh" -OutFile "install-harness.sh"; bash install-harness.sh --merge --yes' -ForegroundColor DarkGray
+Write-Host "   Harness templates are cached locally." -ForegroundColor White
+Write-Host "   Use /init to create a project with Harness auto-installed." -ForegroundColor White
 Write-Host ""
 
 # ==============================
@@ -248,11 +300,12 @@ Write-Host "   Workflows: $wfSuccess/$($Workflows.Count)" -ForegroundColor White
 Write-Host "   Skills:    $skillSuccess/$($SkillNames.Count) ($skillFileCount files)" -ForegroundColor White
 $graphifyStatus = if (Get-Command graphify -ErrorAction SilentlyContinue) { "Installed" } else { "Not installed" }
 Write-Host "   Graphify:  $graphifyStatus" -ForegroundColor White
-Write-Host "   Harness:   Install per-project (see above)" -ForegroundColor White
+Write-Host "   Harness:   $harnessSuccess/$($HarnessFiles.Count) templates cached" -ForegroundColor White
 Write-Host "   Version:   4.2.0" -ForegroundColor White
 Write-Host ""
 Write-Host "  Use AWF in ANY project right now!" -ForegroundColor Cyan
-Write-Host "  Type: /plan, /recap, /code" -ForegroundColor White
+Write-Host "  Type /init to create a project (auto-installs Harness)" -ForegroundColor White
+Write-Host "  Type /plan to plan features. Type /recap for context." -ForegroundColor White
 Write-Host ""
 Write-Host "  To index codebase with Graphify:" -ForegroundColor White
 Write-Host "  cd your-project; graphify update ." -ForegroundColor White

@@ -7,7 +7,6 @@
 set -euo pipefail
 
 REPO_URL="https://raw.githubusercontent.com/xuanhoatrieu/awf/main"
-HARNESS_INSTALLER="https://raw.githubusercontent.com/hoangnb24/harness-experimental/main/scripts/install-harness.sh"
 
 WORKFLOWS=(
     "plan.md" "code.md" "visualize.md" "deploy.md"
@@ -40,9 +39,37 @@ declare -A SKILL_FILES
 SKILL_FILES["awf-pptx"]="scripts/pptx_generator.py scripts/tts_client.py scripts/voice_list.py scripts/batch_tts_bai03.py scripts/batch_tts_bai03_engvi.py"
 SKILL_FILES["awf-video"]="scripts/render_video.py scripts/scan_3b1b.py templates/common_styles.py templates/gradient_descent.py templates/linear_regression.py templates/loss_landscape.py templates/neural_network.py templates/cross_entropy.py templates/test_latex.py templates/omnivoice_service.py"
 
+# Harness template files (downloaded into ~/.gemini/antigravity/harness/)
+HARNESS_FILES=(
+    "docs/FEATURE_INTAKE.md"
+    "docs/HARNESS.md"
+    "docs/ARCHITECTURE.md"
+    "docs/TEST_MATRIX.md"
+    "docs/GLOSSARY.md"
+    "docs/HARNESS_BACKLOG.md"
+    "docs/README.md"
+    "docs/product/README.md"
+    "docs/stories/README.md"
+    "docs/stories/backlog.md"
+    "docs/decisions/README.md"
+    "docs/decisions/0001-harness-first-development.md"
+    "docs/decisions/0002-post-spec-product-lifecycle.md"
+    "docs/decisions/0003-generic-spec-intake-harness.md"
+    "docs/templates/story.md"
+    "docs/templates/decision.md"
+    "docs/templates/spec-intake.md"
+    "docs/templates/validation-report.md"
+    "docs/templates/high-risk-story/overview.md"
+    "docs/templates/high-risk-story/design.md"
+    "docs/templates/high-risk-story/execplan.md"
+    "docs/templates/high-risk-story/validation.md"
+    "scripts-README.md"
+)
+
 # Detect paths
 ANTIGRAVITY_GLOBAL="$HOME/.gemini/antigravity/global_workflows"
 ANTIGRAVITY_SKILLS="$HOME/.gemini/antigravity/skills"
+ANTIGRAVITY_HARNESS="$HOME/.gemini/antigravity/harness"
 GEMINI_MD="$HOME/.gemini/GEMINI.md"
 
 echo ""
@@ -132,7 +159,29 @@ fi
 echo ""
 
 # ==============================
-# 4. Update Global Rules (GEMINI.md)
+# 4. Download Harness Templates
+# ==============================
+echo "⏳ Downloading Harness templates..."
+mkdir -p "$ANTIGRAVITY_HARNESS"
+harness_success=0
+for hf in "${HARNESS_FILES[@]}"; do
+    # Create subdirectory if needed
+    subdir=$(dirname "$hf")
+    if [ "$subdir" != "." ]; then
+        mkdir -p "$ANTIGRAVITY_HARNESS/$subdir"
+    fi
+
+    if curl -f -s -o "$ANTIGRAVITY_HARNESS/$hf" "$REPO_URL/harness/$hf"; then
+        echo "   ✅ $hf"
+        ((harness_success++))
+    else
+        echo "   ❌ $hf"
+    fi
+done
+echo ""
+
+# ==============================
+# 5. Update Global Rules (GEMINI.md)
 # ==============================
 AWF_INSTRUCTIONS='
 
@@ -194,31 +243,21 @@ fi
 echo "4.2.0" > "$HOME/.gemini/awf_version"
 
 # ==============================
-# 5. Harness Integration Notice
-# ==============================
-echo ""
-echo "🏗️  Harness Integration"
-echo "   Harness adds project-level docs for risk classification,"
-echo "   story templates, and decision records."
-echo ""
-echo "   To install Harness in a project:"
-echo '   curl -fsSL "https://raw.githubusercontent.com/hoangnb24/harness-experimental/main/scripts/install-harness.sh?$(date +%s)" | bash -s -- --merge --yes'
-echo ""
-
-# ==============================
 # Summary
 # ==============================
+echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🎉 DONE!"
 echo ""
 echo "   📋 Workflows: $wf_success/${#WORKFLOWS[@]}"
 echo "   🧩 Skills:    $skill_success/${#SKILL_NAMES[@]} (${skill_file_count} files)"
 echo "   🔍 Graphify:  $(command -v graphify &> /dev/null && echo 'Installed' || echo 'Not installed')"
-echo "   🏗️  Harness:   Install per-project (see above)"
+echo "   🏗️  Harness:   $harness_success/${#HARNESS_FILES[@]} templates cached"
 echo "   📌 Version:   4.2.0"
 echo ""
 echo "👉 Use AWF in ANY project right now!"
-echo "👉 Type '/plan' to test. Type '/recap' to see context."
+echo "👉 Type '/init' to create a project (auto-installs Harness)"
+echo "👉 Type '/plan' to plan features. Type '/recap' for context."
 echo ""
 echo "🔍 To index codebase with Graphify:"
 echo "   cd your-project && graphify update ."
