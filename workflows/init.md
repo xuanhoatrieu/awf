@@ -107,6 +107,27 @@ Nếu `~/.gemini/antigravity/harness/` không tồn tại, agent tạo thủ cô
 - `docs/templates/story.md`
 - `docs/templates/decision.md`
 
+### 2.2 Install & Index Graphify (Auto)
+
+Agent PHẢI kiểm tra và cài Graphify:
+
+```bash
+# Auto-install graphify nếu chưa có
+if ! command -v graphify &> /dev/null; then
+    echo "📦 Đang cài Graphify..."
+    pip install graphifyy
+fi
+
+# Index codebase lần đầu (nếu dự án đã có code)
+if [ -d "src" ] || [ -f "package.json" ] || [ -f "main.py" ]; then
+    echo "🔍 Đang index codebase..."
+    cd "$PROJECT_DIR" && graphify .
+    echo "✅ Graphify indexed: graphify-out/"
+else
+    echo "ℹ️ Dự án mới, chưa có code → Graphify sẽ index khi /code chạy"
+fi
+```
+
 ### brain.json template:
 ```json
 {
@@ -156,6 +177,7 @@ Dự án sử dụng [Harness v0](docs/HARNESS.md) để quản lý:
 
 📁 Vị trí: {path}
 🏗️ Harness: Đã cài (risk classification, story templates, decision records)
+🔍 Graphify: Đã cài + index ({X} nodes) hoặc "Sẵn sàng khi có code"
 
 🚀 BƯỚC TIẾP THEO:
 

@@ -1,4 +1,4 @@
-# AWF - Antigravity Workflow Framework v4.2
+# AWF - Antigravity Workflow Framework v4.3
 # Installer for Windows (PowerShell)
 # By xuanhoatrieu (forked + customized)
 # Includes: Workflows + Skills + Graphify + Harness Integration
@@ -89,7 +89,7 @@ $GeminiMd = "$env:USERPROFILE\.gemini\GEMINI.md"
 
 Write-Host ""
 Write-Host "================================================================" -ForegroundColor Cyan
-Write-Host "  AWF - Antigravity Workflow Framework v4.2                     " -ForegroundColor Cyan
+Write-Host "  AWF - Antigravity Workflow Framework v4.3                     " -ForegroundColor Cyan
 Write-Host "  By xuanhoatrieu (forked + customized)                         " -ForegroundColor Cyan
 Write-Host "  Graphify + PPTX + Video + Question-Gen + Harness              " -ForegroundColor Cyan
 Write-Host "================================================================" -ForegroundColor Cyan
@@ -220,7 +220,7 @@ Write-Host ""
 # ==============================
 $AwfInstructions = @"
 
-# AWF - Antigravity Workflow Framework v4.2
+# AWF - Antigravity Workflow Framework v4.3
 
 ## CRITICAL: Command Recognition
 Khi user go cac lenh bat dau bang ``/`` duoi day, day la AWF WORKFLOW COMMANDS.
@@ -279,7 +279,7 @@ if (-not (Test-Path $GeminiMd)) {
 # ==============================
 # 5. Save AWF Version
 # ==============================
-Set-Content -Path "$env:USERPROFILE\.gemini\awf_version" -Value "4.2.0"
+Set-Content -Path "$env:USERPROFILE\.gemini\awf_version" -Value "4.3.0"
 
 # ==============================
 # 6. Harness Integration Notice
@@ -301,7 +301,7 @@ Write-Host "   Skills:    $skillSuccess/$($SkillNames.Count) ($skillFileCount fi
 $graphifyStatus = if (Get-Command graphify -ErrorAction SilentlyContinue) { "Installed" } else { "Not installed" }
 Write-Host "   Graphify:  $graphifyStatus" -ForegroundColor White
 Write-Host "   Harness:   $harnessSuccess/$($HarnessFiles.Count) templates cached" -ForegroundColor White
-Write-Host "   Version:   4.2.0" -ForegroundColor White
+Write-Host "   Version:   4.3.0" -ForegroundColor White
 Write-Host ""
 Write-Host "  Use AWF in ANY project right now!" -ForegroundColor Cyan
 Write-Host "  Type /init to create a project (auto-installs Harness)" -ForegroundColor White

@@ -2,11 +2,13 @@
 description: 🐛 Sửa lỗi
 ---
 
-# WORKFLOW: /debug - The Detective v2.1 (BMAD-Enhanced)
+# WORKFLOW: /debug - The Detective v2.2 (Graphify+Harness)
 
 Bạn là **Antigravity Detective**. User đang gặp lỗi nhưng KHÔNG BIẾT cách mô tả lỗi kỹ thuật.
 
-**Triết lý AWF 2.1:** KHÔNG ĐOÁN MÒ. Thu thập bằng chứng → Đặt giả thuyết → Kiểm chứng → Sửa.
+**Triết lý AWF 2.2:** KHÔNG ĐOÁN MÒ. Thu thập bằng chứng → Đặt giả thuyết → Kiểm chứng → Sửa.
+
+> **⚠️ IMPORT:** Đọc `_shared_gates.md` cho Graphify + Harness gates.
 
 ---
 
@@ -205,6 +207,10 @@ Khi tìm ra lỗi, giải thích cho User bằng ngôn ngữ ĐỜI THƯỜNG:
 
 ## Giai đoạn 4: The Fix (Sửa lỗi)
 
+### 4.0 🛡️ Harness Quick Classification
+Bug fix thường là **tiny lane** (0-1 risk flags) → code trực tiếp.
+Nếu fix TOUCHES auth/data model/API contract → Upgrade to **normal lane** → tạo story file.
+
 ### 4.1. Thực hiện sửa
 *   Sửa code tại đúng vị trí gây lỗi.
 *   Thêm validation/check để tránh lỗi tương tự.
@@ -215,6 +221,16 @@ Khi tìm ra lỗi, giải thích cho User bằng ngôn ngữ ĐỜI THƯỜNG:
 
 ### 4.3. Cleanup
 *   **QUAN TRỌNG:** Xóa sạch các `console.log` debug đã thêm.
+
+### 4.4. 🔍 Graphify Re-index
+Sau khi fix code:
+```bash
+graphify . --update
+```
+
+### 4.5. 🛡️ Harness Close (nếu đã tạo story)
+- Update story status → `done`
+- Update `docs/TEST_MATRIX.md` nếu thêm test
 
 ---
 

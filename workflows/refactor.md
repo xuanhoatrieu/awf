@@ -85,7 +85,12 @@ if technical_level == "newbie":
 *   Trace path tới symbol liên quan: `graphify path "[source]" "[target]"`
 *   Nếu risk = High → Cảnh báo: "Refactor này ảnh hưởng nhiều file. Nên tạo backup branch."
 
-### 1.4. Backup Suggestion
+### 1.4. 🛡️ Harness Classification
+Nếu refactor ảnh hưởng > 5 files hoặc API contracts:
+→ Classify as **normal lane** → tạo story file `docs/stories/US-XXX-refactor-title.md`
+→ Ghi decision record nếu thay đổi architecture pattern
+
+### 1.5. Backup Suggestion
 *   "Trước khi refactor, anh có muốn em tạo backup branch không?"
 *   Nếu CÓ → `git checkout -b backup/before-refactor`
 
@@ -172,6 +177,16 @@ if technical_level == "newbie":
     *   "Đã đổi tên [Z] biến"
     *   "Đã xóa [W] dòng code thừa"
 3.  Khuyến nghị: "Anh chạy `/test` để chắc chắn không có gì bị hỏng."
+
+### 6.1. 🔍 Graphify Re-index
+```bash
+graphify . --update   # Re-index after refactor
+```
+
+### 6.2. 🛡️ Harness Close (nếu đã tạo story)
+- Update story status → `done`
+- Update `docs/TEST_MATRIX.md`
+- Update decision record → `accepted`
 
 ---
 

@@ -145,7 +145,24 @@ Kết quả bổ sung vào báo cáo audit:
 - **API surface:** Tổng exported symbols
 - **God nodes:** Symbols có quá nhiều connections (potential refactor targets)
 
-### 2.5. Documentation Audit
+### 2.5.5. 🛡️ Harness Compliance Audit
+Nếu dự án có `docs/HARNESS.md` → Kiểm tra:
+- **Stories:** Có stories open quá lâu không?
+- **TEST_MATRIX:** Có behaviors chưa có proof không?
+- **Decisions:** Có decisions chưa accepted không?
+- **FEATURE_INTAKE:** Risk classification có đúng format không?
+
+Kết quả bổ sung vào báo cáo:
+```
+🛡️ HARNESS COMPLIANCE:
+├── Stories: X open / Y done / Z total
+├── Stale stories (> 7 days): [list]
+├── TEST_MATRIX gaps: N behaviors without proof
+├── Decisions pending: M records
+└── Compliance: [PASS / NEEDS ATTENTION]
+```
+
+### 2.6. Documentation Audit
 *   README có up-to-date không?
 *   API có document không?
 *   Có inline comments cho logic phức tạp?

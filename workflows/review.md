@@ -90,6 +90,23 @@ Kết quả bổ sung vào báo cáo:
 - **Surprising Connections:** Cross-module links ranked by composite score
 - **Interactive Graph:** Link tới `graphify-out/graph.html` để xem trực quan
 
+### 2.6. 🛡️ Harness Status Report
+Nếu dự án có `docs/HARNESS.md` → Tự động scan:
+```bash
+# Đếm stories
+ls docs/stories/US-*.md 2>/dev/null | wc -l
+# Đếm decisions
+ls docs/decisions/DR-*.md 2>/dev/null | wc -l
+```
+Kết quả bổ sung vào báo cáo:
+```
+🛡️ HARNESS STATUS:
+├── Stories: X done / Y open / Z total
+├── Decisions: N recorded
+├── TEST_MATRIX: M behaviors tracked
+└── Risk distribution: tiny/normal/high-risk counts
+```
+
 ---
 
 ## Giai đoạn 3: Tạo Báo Cáo

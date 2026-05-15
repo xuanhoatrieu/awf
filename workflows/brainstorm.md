@@ -52,6 +52,17 @@ if technical_level == "newbie":
 
 ---
 
+## Giai đoạn 0: 🔍 Graphify Context (nếu dự án đã có code)
+
+Nếu có `graphify-out/` → Tự động chạy TRƯỚC KHI brainstorm:
+```bash
+cat graphify-out/GRAPH_REPORT.md | head -50   # God nodes, communities
+graphify query "[chủ đề brainstorm]" --graph graphify-out/graph.json
+```
+→ Giúp brainstorm dựa trên codebase thực tế, tránh đề xuất tính năng đã có hoặc trùng lặp logic.
+
+---
+
 ## Giai đoạn 1: Hiểu Ý Tưởng Ban Đầu
 
 ### 1.1. Câu hỏi mở đầu (chọn 2-3 câu phù hợp)

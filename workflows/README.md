@@ -1,4 +1,4 @@
-# 🚀 Antigravity Workflow Framework (AWF) v2.0
+# 🚀 Antigravity Workflow Framework (AWF) v4.3 — Graphify & Harness Deep Integration
 
 **Hệ thống Workflow TOÀN DIỆN cho mọi trình độ** - Từ newbie đến pro, AI đều lo được.
 

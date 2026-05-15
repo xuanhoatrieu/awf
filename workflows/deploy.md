@@ -117,6 +117,28 @@ Nếu có tests bị skip:
 → DỪNG workflow, không tiếp tục
 ```
 
+### 2.0.5. 🛡️ Harness Completeness Gate ⭐ v4.3
+```
+Check Harness status nếu có docs/HARNESS.md:
+
+1. Open stories check:
+   Nếu có stories với status != done:
+   → ⚠️ WARNING: "Có X stories chưa close:
+      - US-011: Feature Name (status: in-progress)
+      
+      Anh muốn:
+      1️⃣ Close stories trước khi deploy
+      2️⃣ Deploy anyway (không khuyến khích)"
+
+2. TEST_MATRIX check:
+   Nếu có behaviors chưa có proof:
+   → ⚠️ WARNING: "X behaviors chưa có test coverage"
+
+3. Decision records check:
+   Nếu có decisions chưa accepted:
+   → ℹ️ INFO: "X decisions đang pending review"
+```
+
 ### 2.1. Build Check
 *   Chạy `npm run build`
 *   Failed → DỪNG, đề xuất `/debug`

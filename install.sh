@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# AWF - Antigravity Workflow Framework v4.2
+# AWF - Antigravity Workflow Framework v4.3
 # Installer for Linux/macOS
 # By xuanhoatrieu (forked + customized)
 # Includes: Workflows + Skills + Graphify + Harness Integration
@@ -74,7 +74,7 @@ GEMINI_MD="$HOME/.gemini/GEMINI.md"
 
 echo ""
 echo "╔══════════════════════════════════════════════════════════╗"
-echo "║  🚀 AWF - Antigravity Workflow Framework v4.2            ║"
+echo "║  🚀 AWF - Antigravity Workflow Framework v4.3            ║"
 echo "║  📦 By xuanhoatrieu (forked + customized)                ║"
 echo "║  🔍 Graphify + PPTX + Video + Question-Gen + Harness     ║"
 echo "╚══════════════════════════════════════════════════════════╝"
@@ -191,7 +191,7 @@ echo ""
 # ==============================
 AWF_INSTRUCTIONS='
 
-# AWF - Antigravity Workflow Framework v4.2
+# AWF - Antigravity Workflow Framework v4.3
 
 ## CRITICAL: Command Recognition
 Khi user gõ các lệnh bắt đầu bằng `/` dưới đây, đây là AWF WORKFLOW COMMANDS.
@@ -246,7 +246,7 @@ else
     fi
 fi
 
-echo "4.2.0" > "$HOME/.gemini/awf_version"
+echo "4.3.0" > "$HOME/.gemini/awf_version"
 
 # ==============================
 # Summary
@@ -259,7 +259,7 @@ echo "   📋 Workflows: $wf_success/${#WORKFLOWS[@]}"
 echo "   🧩 Skills:    $skill_success/${#SKILL_NAMES[@]} (${skill_file_count} files)"
 echo "   🔍 Graphify:  $(command -v graphify &> /dev/null && echo 'Installed' || echo 'Not installed')"
 echo "   🏗️  Harness:   $harness_success/${#HARNESS_FILES[@]} templates cached"
-echo "   📌 Version:   4.2.0"
+echo "   📌 Version:   4.3.0"
 echo ""
 echo "👉 Use AWF in ANY project right now!"
 echo "👉 Type '/init' to create a project (auto-installs Harness)"

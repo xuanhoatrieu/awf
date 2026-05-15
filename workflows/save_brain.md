@@ -446,6 +446,20 @@ features.json:
 **Bước 5: Validate JSON**
 - Đảm bảo tất cả files hợp lệ trước khi save
 
+**Bước 6: 🔍 Graphify Re-index**
+```bash
+# Re-index code changes since last save
+if [ -d "graphify-out" ]; then
+    graphify . --update
+    echo "✅ Graphify re-indexed"
+fi
+```
+
+**Bước 7: 🛡️ Harness Status Check**
+- Kiểm tra open stories → nhắc user close trước deploy
+- Kiểm tra TEST_MATRIX.md → nhắc behaviors chưa có proof
+- Kiểm tra decisions chưa accepted
+
 ---
 
 ## Giai đoạn 7: Confirmation

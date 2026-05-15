@@ -2,11 +2,13 @@
 description: 💻 Viết code theo Spec
 ---
 
-# WORKFLOW: /code - The Universal Coder v2.1 (BMAD-Enhanced)
+# WORKFLOW: /code - The Universal Coder v2.2 (Graphify+Harness)
 
 Bạn là **Antigravity Senior Developer**. User muốn biến ý tưởng thành code.
 
 **Nhiệm vụ:** Code đúng, code sạch, code an toàn. **TỰ ĐỘNG** test và fix cho đến khi pass.
+
+> **⚠️ IMPORT:** Đọc `_shared_gates.md` cho Graphify + Harness gates. Các gates là BẮT BUỘC.
 
 ---
 
@@ -102,23 +104,64 @@ Khi code mỗi task:
 
 ---
 
-## Giai đoạn 2.5: 🔍 Graphify Context Lookup (Auto-trigger)
+## Giai đoạn 0.5: 🛡️ Harness Intake Gate (BẮT BUỘC)
 
-Nếu có `graphify-out/` → Trước khi code, tự động chạy:
-```bash
-# Tìm hiểu symbol/module liên quan đến task
-cd [project_root] && graphify query "[function/class cần sửa/thêm]" --graph graphify-out/graph.json
+> Xem chi tiết tại `_shared_gates.md` → Gate 2
 
-# Hoặc search semantic
-cd [project_root] && graphify query "[mô tả task]" --graph graphify-out/graph.json
+Nếu dự án có `docs/FEATURE_INTAKE.md`, agent PHẢI thực hiện TRƯỚC KHI CODE:
+
+1. **Classify input type:** New spec / Spec slice / Change request / Maintenance
+2. **Run risk checklist** (đọc `docs/FEATURE_INTAKE.md`):
+   - Auth? Authorization? Data model? Audit/security? External systems?
+   - Public contracts? Existing behavior? Weak proof? Multi-domain?
+3. **Choose lane:**
+   - 0-1 flags → **tiny** (code trực tiếp, không cần story)
+   - 2-3 flags → **normal** (tạo story file `docs/stories/US-XXX.md`)
+   - 4+ flags hoặc hard gate → **high-risk** (tạo story folder + hỏi user confirm)
+4. **Create story file** (nếu normal+):
+   ```bash
+   cp docs/templates/story.md docs/stories/US-XXX-short-title.md
+   ```
+5. **Log decision** nếu có architecture change:
+   ```bash
+   cp docs/templates/decision.md docs/decisions/DR-XXXX-short-title.md
+   ```
+
+**Hiển thị cho user:**
 ```
+🛡️ HARNESS INTAKE:
+   Lane: normal
+   Risk: Data model (new Prisma model), Public contracts (new API)
+   Story: docs/stories/US-011-feature-name.md
+   → Tiếp tục code...
+```
+
+---
+
+## Giai đoạn 2.5: 🔍 Graphify Context (BẮT BUỘC)
+
+> Xem chi tiết tại `_shared_gates.md` → Gate 1
+
+Agent PHẢI chạy TRƯỚC KHI viết code:
+
+```bash
+# 1. Kiểm tra graphify đã index chưa
+if [ ! -d "graphify-out" ]; then
+    graphify .   # Index lần đầu
+fi
+
+# 2. Query context liên quan đến task
+graphify query "[module/function liên quan]" --graph graphify-out/graph.json
+
+# 3. Nếu sửa function cụ thể — check blast radius
+graphify explain "[function cần sửa]"
+```
+
 Kết quả giúp:
 - Hiểu incoming/outgoing relationships trước khi code
 - Tránh tạo code trùng lặp với logic có sẵn
 - Biết đúng chỗ cần sửa (không phải grep thủ công)
 - Xem god nodes và community structure từ `GRAPH_REPORT.md`
-
-**Sau khi code xong mỗi phase:** Chạy `graphify . --update` để re-index (chỉ changed files).
 
 ---
 
@@ -213,49 +256,64 @@ Nếu có phase file:
 Tiếp phase-02?"
 ```
 
-### 0.2.1. Full Plan Execution (All Phases) ⭐ v3.4
+### 0.2.1. Full Plan Execution (`/code all-phases`) ⭐ v3.4
 
-Khi user gõ `/code all-phases`:
+Khi user gõ `/code all-phases` (có confirm giữa phases):
 
 ```
-1. Confirmation prompt:
-   "🚀 Chế độ ALL PHASES - Sẽ code tuần tự qua TẤT CẢ phases!
-
-   📋 Plan: [plan_name]
-   📊 Phases: 6 phases (phase-01 đến phase-06)
-   ⏱️ Dự kiến: [Không estimate - chỉ liệt kê phases]
-
-   ⚠️ Lưu ý:
-   - Auto-save progress sau mỗi phase
-   - Nếu test fail 3 lần → Dừng và hỏi user
-   - Có thể Ctrl+C để dừng giữa chừng
-
-   Anh muốn:
-   1️⃣ Bắt đầu từ phase-01
-   2️⃣ Bắt đầu từ phase đang dở (phase-X)
-   3️⃣ Xem lại plan trước"
-
+1. Confirmation prompt (chỉ 1 lần đầu)
 2. Execution Loop:
-   for each phase in [phase-01, phase-02, ...]:
-     → Code phase (như 0.2)
-     → Auto-test (Giai đoạn 4)
-     → Auto-save progress (Giai đoạn 5)
-     → Brief summary: "✅ Phase X done. Tiếp phase Y..."
+   for each phase:
+     → Code phase → Auto-test → Save progress
+     → Hỏi: "✅ Phase X done. Tiếp phase Y?"
+3. Completion summary
+```
 
-3. Completion:
+### 0.2.2. Continuous Execution (`/code all`) ⭐ v4.3 NEW
+
+Khi user gõ `/code all`:
+
+```
+1. Đọc plan → lấy danh sách TẤT CẢ phases
+2. KHÔNG hỏi confirm giữa các phases
+3. Tự động chạy tuần tự: phase-01 → phase-02 → ...
+
+4. SAU MỖI PHASE (Phase Checkpoint — BẮT BUỘC):
+   a. graphify . --update              # Re-index code
+   b. Close Harness story/TEST_MATRIX   # Nếu có
+   c. git add . && git commit           # Checkpoint commit
+   d. Update session.json               # current_phase → next
+   e. Log: "✅ Phase XX saved. → Phase YY..."
+
+5. Chỉ DỪNG khi:
+   - Test fail 3 lần liên tiếp → Hỏi user
+   - Rate limit / quota exceeded → Tự đợi + retry:
+     "⏳ Quota exceeded. Đợi 60s rồi retry..."
+     Sleep 60s → retry → nếu 3 lần fail → dừng, save progress
+   - Hoàn thành tất cả phases
+
+6. Completion:
    "🎉 ALL PHASES COMPLETE!
-
-    ✅ 6/6 phases done
-    ✅ All tests passed
-    📝 Files modified: XX files
-
+    ✅ 6/6 phases done | 32 tasks | 0 tests failed
+    📁 45 files created, 12 modified
+    🛡️ Harness: 3 stories created, 1 decision recorded
+    🔍 Graphify: re-indexed (X nodes)
     Next: /deploy hoặc /save-brain"
+```
+
+**Rate limit handling:**
+```
+Khi gặp 429 / quota exceeded / context limit:
+  → Chạy Phase Checkpoint (lưu graphify + harness + commit)
+  → Log: "⏳ Đang chờ quota mới... (retry sau 60s)"
+  → Sleep 60s → retry
+  → Nếu vẫn fail sau 3 lần → dừng, báo user gõ /code all để tiếp tục
 ```
 
 **Khi nào dừng lại:**
 - Test fail sau 3 lần fix → Hỏi user
 - User nhấn Ctrl+C → Save progress, dừng lại
-- Context >80% → Auto-save, thông báo user resume sau
+- Context >80% → Chạy Phase Checkpoint + Auto-save, thông báo user resume sau
 
 ---
 
@@ -506,6 +564,23 @@ Nếu đang code theo phase:
 2️⃣ Nghỉ ngơi? `/save-brain` để lưu progress
 3️⃣ Review lại Phase 1? Em show summary"
 ```
+
+### 5.2.5. 🛡️ Harness Close + 🔍 Graphify Save (BẮT BUỘC sau mỗi phase)
+
+> Xem chi tiết tại `_shared_gates.md` → Gate 3 + Gate 4 + Phase Checkpoint
+
+Sau mỗi phase hoàn thành, agent PHẢI chạy tuần tự:
+
+```
+1. graphify . --update                    # Re-index changed files
+2. Update story status → done             # Nếu đã tạo story
+3. Update docs/TEST_MATRIX.md             # Nếu thêm/sửa test
+4. Update decision record → accepted      # Nếu đã tạo DR
+5. git add . && git commit -m "phase-XX"  # Checkpoint commit
+6. Update session.json → next phase       # Progress tracking
+```
+
+**KHÔNG ĐƯỢC bỏ qua bước này**, kể cả khi đang chạy `/code all`.
 
 ### 5.4. ⭐ LAZY CHECKPOINT SYSTEM (AWF 2.0)
 

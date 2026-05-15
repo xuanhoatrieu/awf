@@ -1,14 +1,16 @@
-# 🚀 AWF - Antigravity Workflow Framework v4.2
+# 🚀 AWF - Antigravity Workflow Framework v4.3
 
 > **Forked & customized** by [xuanhoatrieu](https://github.com/xuanhoatrieu)
 > Original by [TUAN130294](https://github.com/TUAN130294/awf)
 
 AWF biến AI coding agent thành đồng nghiệp chuyên nghiệp — biết lên kế hoạch, phân loại rủi ro, viết code, test, deploy, và ghi lại mọi quyết định.
 
-## ✨ What's New in v4.2
+## ✨ What's New in v4.3
 
 | Feature | Mô tả |
 |---------|--------|
+| **Deep Graphify & Harness Integration** | Tích hợp 4 Shared Gates (Pre-Code & Post-Code) vào toàn bộ core workflows. |
+| **Phase Checkpoints** | `/code all` giờ đây chạy checkpoint tự động theo từng phase. |
 | **27 Workflow Commands** | `/init` → `/deploy` + `/textbook`, `/pptx`, `/question`, `/video` |
 | **11 Auto-trigger Skills** | Graphify, session-restore, auto-save, textbook, PPTX+TTS, video... |
 | **Graphify Intelligence** | Knowledge graph cho codebase (25 ngôn ngữ, AST-based, multimodal) |

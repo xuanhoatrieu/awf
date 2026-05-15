@@ -84,6 +84,15 @@ Step 5: 🔍 Graphify Knowledge Graph (NẾU CÓ graphify-out/)
     🏘️ Communities: [top clusters by size]
     🔄 Main flows: [entry points → process chains]
 
+Step 5.5: 🛡️ Harness Status (NẾU CÓ docs/HARNESS.md)
+├── Scan: docs/stories/US-*.md → count done/open
+├── Scan: docs/decisions/DR-*.md → count accepted/pending
+├── Đọc: docs/TEST_MATRIX.md → count behaviors with/without proof
+└── Hiển thị:
+    🛡️ Harness: Stories X/Y done | Decisions Z | Tests M behaviors
+    ⚠️ Open stories: [list nếu có]
+    📋 Pending decisions: [list nếu có]
+
 Step 6: Generate Summary
 ```
 
