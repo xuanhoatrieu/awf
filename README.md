@@ -9,14 +9,14 @@ AWF biến AI coding agent thành đồng nghiệp chuyên nghiệp — biết l
 
 | Feature | Mô tả |
 |---------|--------|
-| **Deep Graphify & Harness Integration** | Tích hợp 4 Shared Gates (Pre-Code & Post-Code) vào toàn bộ core workflows. |
-| **Phase Checkpoints** | `/code all` giờ đây chạy checkpoint tự động theo từng phase. |
+| **Tích hợp sâu 4 Shared Gates** | Core workflows (/code, /debug, /refactor...) giờ đã có 4 Gates tự động: Pre-Code Graphify, Pre-Code Harness, Post-Code Re-index, Post-Code Harness Close. |
+| **Autonomous `/code all`** | Hỗ trợ Phase Checkpoints: tự động re-index Graphify, đóng story, và commit code sau mỗi phase để tránh mất context. |
+| **Local Harness Templates** | Harness không còn phụ thuộc repo ngoài! Template được gói sẵn trong AWF và `/init` tự động cài đặt offline. |
+| **Metrics & Audit nâng cao** | `/review` và `/audit` tích hợp sâu báo cáo trạng thái Harness (stories, test matrix, risk distribution). |
 | **27 Workflow Commands** | `/init` → `/deploy` + `/textbook`, `/pptx`, `/question`, `/video` |
 | **11 Auto-trigger Skills** | Graphify, session-restore, auto-save, textbook, PPTX+TTS, video... |
 | **Graphify Intelligence** | Knowledge graph cho codebase (25 ngôn ngữ, AST-based, multimodal) |
-| **Harness Integration** | Feature intake, risk classification, story templates, decision records |
 | **Persistent Brain** | `brain.json` giữ infra/github data vĩnh viễn |
-| **Git Safety** | Luôn hỏi trước khi commit/push |
 
 ---
 
@@ -34,17 +34,11 @@ curl -fsSL https://raw.githubusercontent.com/xuanhoatrieu/awf/main/install.sh | 
 iex "& { $(irm https://raw.githubusercontent.com/xuanhoatrieu/awf/main/install.ps1) }"
 ```
 
-### Cài Harness vào dự án (tùy chọn)
+### Tích hợp Harness (Offline)
 
-Harness thêm tài liệu quản lý dự án **per-project** — giúp agent phân loại rủi ro, tạo story, ghi decision records.
+Từ v4.3, Harness template đã được gộp thẳng vào AWF. Bạn **KHÔNG** cần tải từ repo ngoài bằng curl nữa!
+Chỉ cần gõ lệnh `/init` trong cửa sổ chat với AI, AWF sẽ tự động copy toàn bộ cấu trúc Harness (`FEATURE_INTAKE.md`, `TEST_MATRIX.md`, `stories/`...) vào folder dự án hiện tại.
 
-```bash
-# Cài vào dự án mới (clean)
-curl -fsSL "https://raw.githubusercontent.com/hoangnb24/harness-experimental/main/scripts/install-harness.sh?$(date +%s)" | bash -s -- --yes
-
-# Cài vào dự án đã có (merge, giữ file cũ)
-curl -fsSL "https://raw.githubusercontent.com/hoangnb24/harness-experimental/main/scripts/install-harness.sh?$(date +%s)" | bash -s -- --merge --yes
-```
 
 ### Sau khi cài:
 
@@ -145,22 +139,20 @@ cat graphify-out/GRAPH_REPORT.md
 
 ## 🏗️ Harness Integration
 
-Harness cung cấp quy trình quản lý dự án theo chuẩn [Harness Engineering](https://openai.com/index/harness-engineering/):
+Harness cung cấp quy trình quản lý dự án theo chuẩn [Harness Engineering](https://openai.com/index/harness-engineering/). Trong v4.3, AWF áp dụng hệ thống **4 Shared Gates** (`_shared_gates.md`) chạy ngầm trong mọi lệnh thay đổi code:
 
-### Feature Intake Flow
+### 4 Shared Gates Pipeline
 
 ```
-Yêu cầu của anh
+[Gate 1] 🔍 Pre-Code Graphify: Index codebase, query context, phân tích blast radius.
     ↓
-Phân loại input (spec / change / maintenance)
+[Gate 2] 🛡️ Pre-Code Harness: Phân loại rủi ro (Tiny/Normal/High-risk) & Tạo story.
     ↓
-Risk checklist (auth, data, external systems...)
+[CODE]   💻 Agent thực thi viết code theo spec.
     ↓
-Chọn lane: Tiny → Normal → High-risk
+[Gate 3] 🔍 Post-Code Graphify: Tự động re-index (Fast SHA256) các file vừa sửa.
     ↓
-Tạo story + validation expectations
-    ↓
-Code theo AWF workflow
+[Gate 4] 🛡️ Post-Code Harness: Đóng story thành 'done', cập nhật TEST_MATRIX.md.
 ```
 
 ### Risk Lanes
