@@ -1,0 +1,22 @@
+# Brain data (per-conversation, private)
+brain/
+conversations/
+
+# Browser recordings (large binary files)
+browser_recordings/
+
+# Context state (runtime)
+context_state/
+
+# HTML artifacts (generated)
+html_artifacts/
+
+# Implicit/internal
+implicit/
+installation_id
+
+# MCP config (contains local paths)
+mcp_config.json
+
+# Prompting cache
+prompting/
