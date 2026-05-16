@@ -93,6 +93,19 @@ Step 5.5: 🛡️ Harness Status (NẾU CÓ docs/HARNESS.md)
     ⚠️ Open stories: [list nếu có]
     📋 Pending decisions: [list nếu có]
 
+Step 5.9: ⛔ Gate Auto-Check (CHỐNG CONTEXT AMNESIA) 🆕
+├── Đọc: workflows/_shared_gates.md
+├── Kiểm tra: graphify-out/ có tồn tại?
+├── Kiểm tra: docs/FEATURE_INTAKE.md có tồn tại?
+└── Hiển thị:
+    ⛔ Gates active cho session này:
+    ├── 🔍 Graphify: [✅ indexed (X nodes) | ❌ chưa index → nhắc /code sẽ index]
+    ├── 🛡️ Harness: [✅ active | ⬚ không có FEATURE_INTAKE.md]
+    ├── 📋 Phase Checkpoint: ✅ inline trong /code
+    └── 💾 Save Gate: ✅ inline trong /save-brain
+
+    ⚠️ NHẮC: Khi /code, PHẢI đọc _shared_gates.md trước khi bắt đầu.
+
 Step 6: Generate Summary
 ```
 

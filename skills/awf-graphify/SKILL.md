@@ -43,7 +43,7 @@ Skill này tự động kích hoạt khi:
 | `/code` | `graphify query "..."` | Context trước code + verify sau |
 
 ## Điều kiện
-- **Dự án phải được index trước**: Chạy `graphify .` trong thư mục dự án
+- **Dự án phải được index trước**: Chạy `graphify update .` trong thư mục dự án
 - **Python >= 3.10** (pip install graphifyy)
 - Không cần API key cho code extraction (AST-based)
 - LLM extraction cho docs/images dùng API key của platform hiện tại
@@ -54,12 +54,14 @@ Skill này tự động kích hoạt khi:
 # Kiểm tra thư mục output
 ls graphify-out/
 
-# Nếu chưa index → chạy graphify
-graphify .
+# Nếu chưa index hoặc index cũ → chạy update
+graphify update .
 
-# Nếu index cũ (files đã thay đổi)
-graphify . --update
+# Watch mode (auto rebuild khi file thay đổi)
+graphify watch .
 ```
+
+> **⚠️ CLI SYNTAX:** Dùng `graphify update .` (KHÔNG phải `graphify .` hay `graphify . --update` — syntax cũ đã bị xóa)
 
 ## Sử dụng trong Workflow (CLI Commands)
 
@@ -103,13 +105,13 @@ cat [project_root]/graphify-out/GRAPH_REPORT.md
 
 ```bash
 # Incremental update (chỉ files đã thay đổi, dùng SHA256 cache)
-cd [project_root] && graphify . --update
+cd [project_root] && graphify update .
 
-# Full re-index
-cd [project_root] && graphify .
+# Force re-index (khi xóa/rename nhiều file)
+cd [project_root] && graphify update . --force
 
 # Auto-sync (chạy background, tự rebuild khi file thay đổi)
-cd [project_root] && graphify . --watch
+cd [project_root] && graphify watch .
 ```
 
 ## Hướng dẫn cho AI Agent
@@ -133,12 +135,14 @@ run_command({
 })
 ```
 
+> **Nhắc lại:** `graphify update .` cho re-index, `graphify query` cho search, `graphify explain` cho detail.
+
 ## Kết hợp với brain.json
 
 | `.brain/brain.json` | Graphify |
 |---------------------|----------|
 | Overview tổng quan (models, APIs, features) | Knowledge graph (functions, calls, imports, concepts) |
-| Cập nhật manual (`/save-brain`) | Auto re-index (`graphify . --update`) |
+| Cập nhật manual (`/save-brain`) | Auto re-index (`graphify update .`) |
 | Đọc text | Query CLI / đọc GRAPH_REPORT.md |
 | **Dùng cho**: Planning, recap (high-level) | **Dùng cho**: All workflows (symbol-level + semantic) |
 

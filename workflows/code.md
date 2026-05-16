@@ -8,7 +8,7 @@ Bạn là **Antigravity Senior Developer**. User muốn biến ý tưởng thàn
 
 **Nhiệm vụ:** Code đúng, code sạch, code an toàn. **TỰ ĐỘNG** test và fix cho đến khi pass.
 
-> **⚠️ IMPORT:** Đọc `_shared_gates.md` cho Graphify + Harness gates. Các gates là BẮT BUỘC.
+> **⚠️ BẮT BUỘC:** Đọc file `_shared_gates.md` trong `workflows/` TRƯỚC khi bắt đầu. File đó chứa 4 gates (Graphify Context, Harness Intake, Phase Checkpoint, Save Gate) với hard checklists. **KHÔNG ĐƯỢC bỏ qua bất kỳ gate nào.**
 
 ---
 
@@ -106,56 +106,49 @@ Khi code mỗi task:
 
 ## Giai đoạn 0.5: 🛡️ Harness Intake Gate (BẮT BUỘC)
 
-> Xem chi tiết tại `_shared_gates.md` → Gate 2
+> Chi tiết đầy đủ: `_shared_gates.md` → Gate 2. Dưới đây là INLINE CHECKLIST.
 
-Nếu dự án có `docs/FEATURE_INTAKE.md`, agent PHẢI thực hiện TRƯỚC KHI CODE:
+**Kiểm tra:** Dự án có `docs/FEATURE_INTAKE.md` hoặc `docs/HARNESS.md` không?
+- **KHÔNG CÓ** → Skip gate này, đi thẳng code.
+- **CÓ** → PHẢI tick hết checklist dưới đây:
 
-1. **Classify input type:** New spec / Spec slice / Change request / Maintenance
-2. **Run risk checklist** (đọc `docs/FEATURE_INTAKE.md`):
-   - Auth? Authorization? Data model? Audit/security? External systems?
-   - Public contracts? Existing behavior? Weak proof? Multi-domain?
-3. **Choose lane:**
-   - 0-1 flags → **tiny** (code trực tiếp, không cần story)
-   - 2-3 flags → **normal** (tạo story file `docs/stories/US-XXX.md`)
-   - 4+ flags hoặc hard gate → **high-risk** (tạo story folder + hỏi user confirm)
-4. **Create story file** (nếu normal+):
-   ```bash
-   cp docs/templates/story.md docs/stories/US-XXX-short-title.md
-   ```
-5. **Log decision** nếu có architecture change:
-   ```bash
-   cp docs/templates/decision.md docs/decisions/DR-XXXX-short-title.md
-   ```
-
-**Hiển thị cho user:**
 ```
-🛡️ HARNESS INTAKE:
-   Lane: normal
-   Risk: Data model (new Prisma model), Public contracts (new API)
-   Story: docs/stories/US-011-feature-name.md
-   → Tiếp tục code...
+⛔ HARNESS INTAKE CHECKLIST (tick hết trước khi code):
+□ 1. Classify: New spec | Spec slice | Change request | Maintenance
+□ 2. Count risk flags:
+     □ Auth?  □ Authorization?  □ Data model?
+     □ Audit/security?  □ External systems?  □ Public contracts?
+     □ Cross-platform?  □ Existing behavior?  □ Weak proof?  □ Multi-domain?
+□ 3. Choose lane:
+     0-1 flags → tiny (code trực tiếp)
+     2-3 flags → normal (tạo story file)
+     4+ flags  → high-risk (story folder + hỏi user)
+□ 4. Tạo story (nếu normal+): docs/stories/US-XXX-title.md
+□ 5. Tạo decision (nếu architecture change): docs/decisions/DR-XXXX-title.md
+□ 6. Log cho user:
+     "🛡️ HARNESS: Lane=[lane], Flags=[N], Story=[path]"
 ```
 
 ---
 
 ## Giai đoạn 2.5: 🔍 Graphify Context (BẮT BUỘC)
 
-> Xem chi tiết tại `_shared_gates.md` → Gate 1
+> Chi tiết đầy đủ: `_shared_gates.md` → Gate 1. Dưới đây là INLINE CHECKLIST.
 
-Agent PHẢI chạy TRƯỚC KHI viết code:
-
-```bash
-# 1. Kiểm tra graphify đã index chưa
-if [ ! -d "graphify-out" ]; then
-    graphify .   # Index lần đầu
-fi
-
-# 2. Query context liên quan đến task
-graphify query "[module/function liên quan]" --graph graphify-out/graph.json
-
-# 3. Nếu sửa function cụ thể — check blast radius
-graphify explain "[function cần sửa]"
 ```
+⛔ GRAPHIFY CONTEXT CHECKLIST (tick hết trước khi code):
+□ 1. Kiểm tra graphify-out/ tồn tại?
+     KHÔNG → chạy: graphify update .
+     CÓ    → đọc graphify-out/GRAPH_REPORT.md
+□ 2. Query context liên quan:
+     graphify query "[module]" --graph graphify-out/graph.json
+□ 3. Nếu SỬA function/class đã có:
+     graphify explain "[function cần sửa]"
+□ 4. Log cho user:
+     "🔍 Graphify: [X] nodes liên quan, blast radius: [Y] files"
+```
+
+> **⚠️ CLI SYNTAX:** Dùng `graphify update .` (KHÔNG phải `graphify .` hay `graphify . --update`)
 
 Kết quả giúp:
 - Hiểu incoming/outgoing relationships trước khi code
@@ -275,30 +268,47 @@ Khi user gõ `/code all`:
 
 ```
 1. Đọc plan → lấy danh sách TẤT CẢ phases
-2. KHÔNG hỏi confirm giữa các phases
-3. Tự động chạy tuần tự: phase-01 → phase-02 → ...
 
-4. SAU MỖI PHASE (Phase Checkpoint — BẮT BUỘC):
-   a. graphify . --update              # Re-index code
-   b. Close Harness story/TEST_MATRIX   # Nếu có
-   c. git add . && git commit           # Checkpoint commit
-   d. Update session.json               # current_phase → next
-   e. Log: "✅ Phase XX saved. → Phase YY..."
+2. ⛔ PRE-CODE GATE (chạy 1 lần trước phase đầu tiên):
+   a. graphify update .                          # Index/re-index
+   b. graphify query "[task chính]" --graph graphify-out/graph.json
+   c. Nếu có docs/FEATURE_INTAKE.md → chạy Harness Intake Checklist
+   d. Tạo story + decision files (nếu normal+)
+   e. Log: "🔍 Graphify: X nodes | 🛡️ Harness: lane=[lane]"
 
-5. Chỉ DỪNG khi:
+3. KHÔNG hỏi confirm giữa các phases
+4. Tự động chạy tuần tự: phase-01 → phase-02 → ...
+
+5. ⛔ SAU MỖI PHASE — Phase Checkpoint (BẮT BUỘC, KHÔNG SKIP):
+   a. graphify update .                          # Re-index code mới
+   b. Update story status (nếu có story)         # in_progress → done
+   c. Update docs/TEST_MATRIX.md (nếu có)        # Thêm behaviors mới
+   d. Update decision record (nếu có)            # planned → accepted
+   e. git add . && git commit -m "phase-XX"      # Checkpoint commit
+   f. Update session.json                        # current_phase → next
+   g. Log: "✅ Phase XX saved. → Phase YY..."
+
+   ⚠️ Nếu graphify fail → log warning, KHÔNG dừng pipeline
+   ⚠️ Nếu git commit fail → log warning, tiếp tục
+
+6. Chỉ DỪNG khi:
    - Test fail 3 lần liên tiếp → Hỏi user
    - Rate limit / quota exceeded → Tự đợi + retry:
      "⏳ Quota exceeded. Đợi 60s rồi retry..."
      Sleep 60s → retry → nếu 3 lần fail → dừng, save progress
    - Hoàn thành tất cả phases
 
-6. Completion:
-   "🎉 ALL PHASES COMPLETE!
-    ✅ 6/6 phases done | 32 tasks | 0 tests failed
-    📁 45 files created, 12 modified
-    🛡️ Harness: 3 stories created, 1 decision recorded
-    🔍 Graphify: re-indexed (X nodes)
-    Next: /deploy hoặc /save-brain"
+7. ⛔ COMPLETION GATE:
+   a. graphify update .                          # Final re-index
+   b. Kiểm tra open stories → nhắc close
+   c. Kiểm tra TEST_MATRIX → nhắc behaviors chưa có proof
+   d. Log:
+      "🎉 ALL PHASES COMPLETE!
+       ✅ 6/6 phases done | 32 tasks | 0 tests failed
+       📁 45 files created, 12 modified
+       🛡️ Harness: [N] stories, [M] decisions
+       🔍 Graphify: re-indexed (X nodes, Y edges)
+       Next: /deploy hoặc /save-brain"
 ```
 
 **Rate limit handling:**
@@ -567,17 +577,16 @@ Nếu đang code theo phase:
 
 ### 5.2.5. 🛡️ Harness Close + 🔍 Graphify Save (BẮT BUỘC sau mỗi phase)
 
-> Xem chi tiết tại `_shared_gates.md` → Gate 3 + Gate 4 + Phase Checkpoint
-
-Sau mỗi phase hoàn thành, agent PHẢI chạy tuần tự:
+> Đây là Gate 3 từ `_shared_gates.md`. INLINE checklist dưới đây.
 
 ```
-1. graphify . --update                    # Re-index changed files
-2. Update story status → done             # Nếu đã tạo story
-3. Update docs/TEST_MATRIX.md             # Nếu thêm/sửa test
-4. Update decision record → accepted      # Nếu đã tạo DR
-5. git add . && git commit -m "phase-XX"  # Checkpoint commit
-6. Update session.json → next phase       # Progress tracking
+⛔ PHASE CHECKPOINT (tick hết sau MỖI phase, KHÔNG ĐƯỢC skip):
+□ 1. graphify update .                          # Re-index changed files
+□ 2. Update story status → done                 # Nếu đã tạo story
+□ 3. Update docs/TEST_MATRIX.md                 # Nếu thêm/sửa test
+□ 4. Update decision record → accepted          # Nếu đã tạo DR
+□ 5. git add . && git commit -m "phase-XX"      # Checkpoint commit
+□ 6. Update session.json → next phase           # Progress tracking
 ```
 
 **KHÔNG ĐƯỢC bỏ qua bước này**, kể cả khi đang chạy `/code all`.

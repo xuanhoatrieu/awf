@@ -1,131 +1,164 @@
 ---
-description: Shared gates cho mọi workflow có code change. IMPORT file này thay vì duplicate logic.
+description: ⛔ Shared Gates cho Graphify + Harness (BẮT BUỘC cho /code, /refactor, /debug, /audit)
 ---
 
-# Shared Gates — Graphify & Harness Integration
+# Shared Gates — Graphify + Harness
 
-> **File này được IMPORT bởi:** `/code`, `/debug`, `/refactor`, `/deploy`, `/save_brain`
-> **KHÔNG BAO GIỜ bỏ qua các gates này khi dự án có `graphify-out/` hoặc `docs/FEATURE_INTAKE.md`.**
-
----
-
-## Gate 1: 🔍 Graphify — Pre-Code Context
-
-**Khi nào:** TRƯỚC KHI viết/sửa code
-**Điều kiện:** `graphify-out/` tồn tại trong project root
-
-```bash
-# 1. Kiểm tra graphify đã cài chưa
-if ! command -v graphify &> /dev/null; then
-    pip install graphifyy
-fi
-
-# 2. Kiểm tra đã index chưa
-if [ ! -d "graphify-out" ]; then
-    graphify .   # Index lần đầu
-fi
-
-# 3. Query context liên quan đến task hiện tại
-graphify query "[module/function liên quan]" --graph graphify-out/graph.json
-
-# 4. Nếu sửa function cụ thể — check blast radius
-graphify explain "[function cần sửa]"
-```
-
-**Mục đích:**
-- Hiểu incoming/outgoing relationships trước khi code
-- Tránh tạo code trùng lặp với logic có sẵn
-- Biết blast radius của thay đổi
+> **File này là BẮT BUỘC.** Mọi workflow có tag `⚠️ IMPORT: _shared_gates.md` PHẢI đọc và tuân thủ.
+> **IMPORT bởi:** `/code`, `/debug`, `/refactor`, `/deploy`, `/save_brain`
 
 ---
 
-## Gate 2: 🛡️ Harness — Risk Classification
+## ⛔ GATE 1: Graphify Context (TRƯỚC KHI CODE)
 
-**Khi nào:** TRƯỚC KHI viết/sửa code (sau Gate 1)
-**Điều kiện:** `docs/FEATURE_INTAKE.md` tồn tại trong project
+> **Khi nào:** Trước khi viết/sửa bất kỳ file nào trong `/code`, `/refactor`, `/debug`
 
-### Bước 1: Classify input type
-- New spec / Spec slice / Change request / Maintenance / Harness improvement
+### Hard Checklist (PHẢI tick hết):
 
-### Bước 2: Run risk checklist
-| Risk flag | Applies when touching |
-|-----------|----------------------|
-| Auth | login, logout, sessions, JWT, password, refresh token |
-| Authorization | roles, permissions, tenant scope |
-| Data model | schema, migrations, uniqueness, deletion |
-| Audit/security | audit logs, privacy, sensitive data |
-| External systems | email, payments, cloud services, provider SDKs, queues |
-| Public contracts | API shape, response envelope, client-visible behavior |
-| Cross-platform | desktop/mobile/browser split |
-| Existing behavior | already implemented behavior changes |
-| Weak proof | unclear or missing tests around affected area |
-| Multi-domain | more than one product domain changes at once |
-
-### Bước 3: Choose lane
 ```
-0-1 flags → tiny (patch directly, no story needed)
-2-3 flags → normal (create story file docs/stories/US-XXX.md)
-4+ flags or hard gate → high-risk (create story folder + ask user confirm)
+□ 1. Kiểm tra graphify-out/ tồn tại
+     Nếu KHÔNG → chạy: graphify update .
+     Nếu CÓ    → đọc GRAPH_REPORT.md cho overview
+
+□ 2. Query context liên quan
+     graphify query "[module/function liên quan]" --graph graphify-out/graph.json
+
+□ 3. Nếu SỬA function/class đã có:
+     graphify explain "[function cần sửa]"
+     → Đọc blast radius trước khi code
+
+□ 4. Log kết quả cho user:
+     "🔍 Graphify: [X] nodes liên quan, blast radius: [Y] files"
 ```
 
-**Hard gates (auto high-risk):** Auth, Authorization, Data loss, Audit/security, External provider
-
-### Bước 4: Create artifacts (nếu normal+)
-```bash
-# Story file
-cp docs/templates/story.md docs/stories/US-XXX-short-title.md
-
-# Decision record (nếu architecture change)
-cp docs/templates/decision.md docs/decisions/DR-XXXX-short-title.md
-```
-
-### Bước 5: Display to user
-```
-🛡️ HARNESS INTAKE:
-   Lane: normal
-   Risk: Data model, Public contracts
-   Story: docs/stories/US-011-feature-name.md
-   → Tiếp tục code...
-```
+### Bypass Rule:
+- **Tiny task** (thêm comment, sửa typo, CSS-only): Có thể skip Gate 1
+- **Mọi task khác**: KHÔNG ĐƯỢC skip
 
 ---
 
-## Gate 3: 🔍 Graphify — Post-Code Re-index
+## ⛔ GATE 2: Harness Intake (TRƯỚC KHI CODE)
 
-**Khi nào:** SAU KHI code xong (mỗi phase hoặc mỗi task lớn)
+> **Khi nào:** Khi project có `docs/FEATURE_INTAKE.md` hoặc `docs/HARNESS.md`
 
-```bash
-graphify . --update   # Re-index changed files (SHA256 cache, fast)
+### Hard Checklist (PHẢI tick hết):
+
 ```
+□ 1. Classify input type:
+     New spec | Spec slice | Change request | Maintenance | Harness improvement
+
+□ 2. Run risk checklist (đếm flags):
+     □ Auth?           □ Authorization?      □ Data model?
+     □ Audit/security? □ External systems?   □ Public contracts?
+     □ Cross-platform? □ Existing behavior?  □ Weak proof?
+     □ Multi-domain?
+
+□ 3. Choose lane:
+     0-1 flags → tiny  (code trực tiếp)
+     2-3 flags → normal (tạo story file)
+     4+ flags  → high-risk (tạo story folder + hỏi user)
+
+     Hard gates (auto high-risk): Auth, Authorization, Data loss, Audit/security, External provider
+
+□ 4. Tạo artifacts (nếu normal+):
+     □ Story:    cp docs/templates/story.md → docs/stories/US-XXX-title.md
+     □ Decision: cp docs/templates/decision.md → docs/decisions/DR-XXXX-title.md (nếu architecture change)
+
+□ 5. Log cho user:
+     "🛡️ HARNESS: Lane=[lane], Flags=[N], Story=[path]"
+```
+
+### Bypass Rule:
+- **Dự án KHÔNG có** `docs/FEATURE_INTAKE.md`: Skip Gate 2 hoàn toàn
+- **Tiny lane**: Không cần story/decision file
 
 ---
 
-## Gate 4: 🛡️ Harness — Post-Code Close
+## ⛔ GATE 3: Phase Checkpoint (SAU MỖI PHASE)
 
-**Khi nào:** SAU KHI code + test xong (mỗi phase)
-**Điều kiện:** Đã tạo story file ở Gate 2
+> **Khi nào:** Sau khi hoàn thành mỗi phase trong `/code`, `/code all`, `/code all-phases`
 
-1. **Update story status** → `done` trong story file
-2. **Update TEST_MATRIX.md** nếu thêm/sửa test:
-   ```markdown
-   | Behavior | Proof | Status |
-   |----------|-------|--------|
-   | Feature X CRUD | Manual API test | ✅ |
-   ```
-3. **Update decision record** → status = `accepted` (nếu đã tạo)
-
----
-
-## Phase Checkpoint (dùng cho `/code all`)
-
-SAU MỖI PHASE trong `/code all`, BẮT BUỘC chạy tuần tự:
+### Hard Checklist (PHẢI tick hết, KHÔNG ĐƯỢC skip):
 
 ```
-1. Gate 3: graphify . --update          (re-index code)
-2. Gate 4: Close story/update TEST_MATRIX (nếu có)  
-3. Commit: git add . && git commit -m "phase-XX: description"
-4. Update session.json: current_phase → next phase
-5. Log: "✅ Phase XX done. Graphify + Harness saved. → Phase YY..."
+□ 1. graphify update .                          # Re-index code mới
+□ 2. Update story status (nếu có story file)    # planned → in_progress → done
+□ 3. Update docs/TEST_MATRIX.md (nếu có)        # Thêm behaviors mới
+□ 4. Update decision record (nếu có)            # planned → accepted
+□ 5. git add . && git commit -m "phase-XX"      # Checkpoint commit
+□ 6. Update .brain/session.json                 # current_phase → next
 ```
+
+### Đặc biệt cho `/code all`:
+- Checkpoint chạy **TỰ ĐỘNG** sau mỗi phase, KHÔNG CẦN confirm
+- Nếu graphify fail → log warning, KHÔNG dừng pipeline
+- Nếu git commit fail → log warning, tiếp tục
 
 **Mục đích:** Nếu agent bị ngắt giữa chừng (quota, timeout, crash), phase trước đã được lưu hoàn chỉnh — session sau chỉ cần `/recap` là tiếp tục từ phase tiếp theo.
+
+---
+
+## ⛔ GATE 4: Save Gate (SAU KHI HOÀN TẤT)
+
+> **Khi nào:** Khi `/save-brain` hoặc cuối `/code all`
+
+### Hard Checklist:
+
+```
+□ 1. graphify update .                    # Final re-index
+□ 2. Kiểm tra open stories               # Nhắc user close
+□ 3. Kiểm tra TEST_MATRIX.md             # Nhắc behaviors chưa có proof
+□ 4. Kiểm tra decisions chưa accepted    # Nhắc user
+□ 5. Update .brain/ files                 # brain.json, session.json, handover.md
+```
+
+---
+
+## Quick Reference Card
+
+```
+┌─────────────────────────────────────────────────┐
+│  AWF GATE SEQUENCE                              │
+│                                                 │
+│  /code [task]                                   │
+│    ├── ⛔ Gate 1: Graphify Context               │
+│    ├── ⛔ Gate 2: Harness Intake                  │
+│    ├── 💻 Code phase                             │
+│    ├── ⛔ Gate 3: Phase Checkpoint                │
+│    │     ├── graphify update .                   │
+│    │     ├── Update story/TEST_MATRIX            │
+│    │     └── git commit checkpoint               │
+│    ├── 💻 Next phase...                          │
+│    ├── ⛔ Gate 3: Phase Checkpoint                │
+│    └── ⛔ Gate 4: Save Gate (if /save-brain)      │
+│                                                 │
+│  BYPASS: tiny task = skip Gate 1+2               │
+│  BYPASS: no FEATURE_INTAKE.md = skip Gate 2      │
+└─────────────────────────────────────────────────┘
+```
+
+---
+
+## Graphify CLI Quick Reference (v2.x)
+
+```bash
+# Index lần đầu hoặc re-index
+graphify update .
+
+# Force re-index (khi xóa/rename nhiều file)
+graphify update . --force
+
+# Query context
+graphify query "search term" --graph graphify-out/graph.json
+
+# Explain symbol
+graphify explain "ClassName"
+
+# Shortest path
+graphify path "A" "B"
+
+# Watch mode (auto rebuild)
+graphify watch .
+```
+
+> **⚠️ KHÔNG dùng** `graphify .` hay `graphify . --update` — syntax cũ đã bị xóa.
